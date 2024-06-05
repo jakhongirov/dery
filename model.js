@@ -140,7 +140,6 @@ const foundUserRelationship = (user_id) => {
 }
 const addUserRelationship = (
    requestName,
-   requestGender,
    requestBirthday,
    user_id
 ) => {
@@ -148,21 +147,18 @@ const addUserRelationship = (
       INSERT INTO
          users_relationship (
             relationship_name,
-            relationship_gender,
             relationship_birthday,
             user_id
          ) VALUES (
             $1,
             $2,
-            $3,
-            $4
+            $3
          ) RETURNING *;
    `;
 
    return fetch(
       QUERY,
       requestName,
-      requestGender,
       requestBirthday,
       user_id
    )
