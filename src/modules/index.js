@@ -17,7 +17,7 @@ router
    .get('/admins/list', AUTH, admins.GET_ADMIN)
    .post('/admin/register', admins.REGISTER_ADMIN)
    .post('/admin/login', admins.LOGIN_ADMIN)
-   .put('/admin/edit', admins.EDIT_ADMIN)
+   .put('/admin/edit', AUTH, admins.EDIT_ADMIN)
    .delete('/admin/delete', AUTH, admins.DELETE_ADMIN)
 
    // USERS
