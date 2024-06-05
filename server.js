@@ -249,7 +249,7 @@ bot.on('callback_query', async msg => {
                                        const registerUser = await model.registerUser(
                                           requestName,
                                           requestGender,
-                                          requestContact,
+                                          `+${requestContact}`,
                                           chatId,
                                           personal_code,
                                           referral_code,
