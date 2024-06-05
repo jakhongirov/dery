@@ -1,0 +1,76 @@
+const model = require('./model')
+
+module.exports = {
+   GET: async (req, res) => {
+      try {
+         const { limit, page } = req.query
+
+         if (limit && page) {
+            const usersList = await model.usersList(limit, page)
+
+            if (usersList?.length > 0) {
+               return res.status(200).json({
+                  status: 200,
+                  message: "Success",
+                  data: usersList
+               })
+            } else {
+               return res.status(404).json({
+                  status: 404,
+                  message: "Not found"
+               })
+            }
+
+         } else {
+            return res.status(400).json({
+               status: 400,
+               message: "Must write limit and page"
+            })
+         }
+
+      } catch (error) {
+         console.log(error);
+         res.status(500).json({
+            status: 500,
+            message: "Interval Server Error"
+         })
+      }
+   },
+
+   GET_BY_ID: async (req, res) => {
+      try {
+         const { id } = req.params
+
+         if (id) {
+            const foundUserById = await model.foundUserById(id)
+
+            if (foundUserById) {
+               return res.status(200).json({
+                  status: 200,
+                  message: "Success",
+                  data: foundUserById
+               })
+            } else {
+               return res.status(404).json({
+                  status: 404,
+                  message: "Not found"
+               })
+            }
+
+         } else {
+            return res.status(400).json({
+               status: 400,
+               message: "Bad request"
+            })
+         }
+
+      } catch (error) {
+         console.log(error);
+         res.status(500).json({
+            status: 500,
+            message: "Interval Server Error"
+         })
+      }
+   },
+
+}
