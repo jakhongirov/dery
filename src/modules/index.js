@@ -20,7 +20,7 @@ router
    .delete('/admin/delete', AUTH, admins.DELETE_ADMIN)
 
    // USERS
-   .get('/users/list', users.GET)
+   .get('/users/list', AUTH, users.GET)
    .get('/user/:id', users.GET_BY_ID)
 
    // CATEGORIES
