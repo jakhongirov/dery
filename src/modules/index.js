@@ -33,14 +33,14 @@ router
    .get('/products/list/admin', AUTH, products.GET)
    .get('/products/:category_id', products.GET_CATEGORY)
    .get('/products/list/:id', products.GET_ID)
-   .post('/product/add', AUTH, products.ADD_PRODUCT)
-   .put('/product/edit', AUTH, products.EDIT_PRODUCT)
+   .post('/product/add', AUTH, FileUpload.single('image'), products.ADD_PRODUCT)
+   .put('/product/edit', AUTH, FileUpload.single('image'), products.EDIT_PRODUCT)
    .delete('/product/delete', AUTH, products.DELETE_PRODUCT)
 
    // NEWS
    .get('/news/list', AUTH, news.GET)
    .get('/news/:id', AUTH, news.GET_ID)
-   .post('/news/add', AUTH, news.ADD_NEWS)
+   .post('/news/add', AUTH, FileUpload.single('image'), news.ADD_NEWS)
    .delete('/news/delete', AUTH, news.DELETE)
 
 module.exports = router
