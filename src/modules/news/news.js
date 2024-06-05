@@ -103,7 +103,7 @@ module.exports = {
          if (addNews) {
             usersList?.forEach(e => {
                if (e?.user_lang == 'uz') {
-                  bot.sendPhoto(e?.user_chat_id,fs.readFileSync(path.resolve(__dirname, '..', '..', '..', 'public', 'images', `${imgName}`)), {
+                  bot.sendPhoto(e?.user_chat_id, fs.readFileSync(path.resolve(__dirname, '..', '..', '..', 'public', 'images', `${imgName}`)), {
                      parse_mode: "HTML",
                      caption: `<strong>${news_title_uz}</strong>\n\n${news_description_uz}`
                   })
@@ -149,6 +149,13 @@ module.exports = {
                   const deleteOldAvatar = new FS(path.resolve(__dirname, '..', '..', '..', 'public', 'images', `${deleteNews?.news_image_name}`))
                   deleteOldAvatar.delete()
                }
+
+               return res.status(200).json({
+                  status: 200,
+                  message: "Success",
+                  data: deleteNews
+               })
+
             } else {
                return res.status(400).json({
                   status: 400,
