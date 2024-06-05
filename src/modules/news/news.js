@@ -102,9 +102,14 @@ module.exports = {
          if (addNews) {
             usersList?.forEach(e => {
                if (e?.user_lang == 'uz') {
-                  bot.sendPhoto(e?.user_chat_id, new FS(path.resolve(__dirname, '..', '..', '..', 'public', 'images', `${deleteProduct?.product_image_name}`)), {
+                  bot.sendPhoto(e?.user_chat_id, new FS(path.resolve(__dirname, '..', '..', '..', 'public', 'images', `${uploadPhoto?.filename}`)), {
                      parse_mode: "HTML",
                      caption: `<strong>${news_title_uz}</strong>\n\n${news_description_uz}`
+                  })
+               } else if (e?.user_lang == 'ru') {
+                  bot.sendPhoto(e?.user_chat_id, new FS(path.resolve(__dirname, '..', '..', '..', 'public', 'images', `${uploadPhoto?.filename}`)), {
+                     parse_mode: "HTML",
+                     caption: `<strong>${news_title_ru}</strong>\n\n${news_description_ru}`
                   })
                }
             });

@@ -26,6 +26,17 @@ const foundNews = (id) => {
 
    return fetch(QUERY, id)
 }
+const usersList = () => {
+   const QUERY = `
+      SELECT
+         user_chat_id,
+         user_lang
+      FROM
+         users;
+   `;
+
+   return fetchALL(QUERY)
+}
 const addNews = (
    news_title_uz,
    news_title_ru,
@@ -78,6 +89,7 @@ const deleteNews = (id) => {
 module.exports = {
    newsList,
    foundNews,
+   usersList,
    addNews,
    deleteNews
 }
