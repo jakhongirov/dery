@@ -2,6 +2,7 @@ require('dotenv').config();
 const model = require('./model')
 const path = require('path')
 const FS = require('../../lib/fs/fs')
+const fs = require('fs')
 const { bot } = require('../../lib/bot')
 
 module.exports = {
@@ -102,12 +103,12 @@ module.exports = {
          if (addNews) {
             usersList?.forEach(e => {
                if (e?.user_lang == 'uz') {
-                  bot.sendPhoto(e?.user_chat_id, new FS(path.resolve(__dirname, '..', '..', '..', 'public', 'images', `${uploadPhoto?.filename}`)), {
+                  bot.sendPhoto(e?.user_chat_id,fs.readFileSync(path.resolve(__dirname, '..', '..', '..', 'public', 'images', `${imgName}`)), {
                      parse_mode: "HTML",
                      caption: `<strong>${news_title_uz}</strong>\n\n${news_description_uz}`
                   })
                } else if (e?.user_lang == 'ru') {
-                  bot.sendPhoto(e?.user_chat_id, new FS(path.resolve(__dirname, '..', '..', '..', 'public', 'images', `${uploadPhoto?.filename}`)), {
+                  bot.sendPhoto(e?.user_chat_id, fs.readFileSync(path.resolve(__dirname, '..', '..', '..', 'public', 'images', `${imgName}`)), {
                      parse_mode: "HTML",
                      caption: `<strong>${news_title_ru}</strong>\n\n${news_description_ru}`
                   })

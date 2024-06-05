@@ -41,7 +41,7 @@ router
    // NEWS
    .get('/news/list', AUTH, news.GET)
    .get('/news/:id', AUTH, news.GET_ID)
-   .post('/news/add', AUTH, FileUpload.single('image'), news.ADD_NEWS)
+   .post('/news/add', FileUpload.single('image'), news.ADD_NEWS)
    .delete('/news/delete', AUTH, news.DELETE)
 
 module.exports = router
