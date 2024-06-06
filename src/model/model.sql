@@ -25,7 +25,6 @@ CREATE TABLE users (
 CREATE TABLE users_relationship (
    id bigserial PRIMARY KEY,
    relationship_name text,
-   relationship_gender text,
    relationship_birthday text,
    user_id int REFERENCES users(user_id) ON DELETE CASCADE,
    relationship_create_at timestamptz DEFAULT CURRENT_TIMESTAMP

@@ -7,10 +7,11 @@ const router = require("./src/modules");
 const fs = require('fs');
 const path = require('path')
 const QRCode = require('qrcode');
+const cron = require('node-cron');
 const { v4: uuidv4 } = require('uuid');
 const { bot } = require('./src/lib/bot')
 const model = require('./model')
-const { formatNumber } = require('./src/lib/functions')
+const { formatNumber, checkBirthdays } = require('./src/lib/functions')
 
 const publicFolderPath = path.join(__dirname, 'public');
 const imagesFolderPath = path.join(publicFolderPath, 'images');
@@ -28,6 +29,15 @@ if (!fs.existsSync(imagesFolderPath)) {
 } else {
    console.log('Images folder already exists within the public folder.');
 }
+
+cron.schedule('0 0 * * *', async () => {
+   console.log('Running check every minute');
+   checkBirthdays()
+});
+
+(async () => {
+   await checkBirthdays();
+ })();
 
 // START
 bot.onText(/\/start/, async msg => {

@@ -163,7 +163,25 @@ const addUserRelationship = (
       user_id
    )
 }
+const foundRelationship = (todayString) => {
+   const QUERY = `
+      SELECT
+         user_lang,
+         user_chat_id,
+         relationship_name,
+         relationship_birthday
+      FROM
+         users_relationship a
+      INNER JOIN
+         users b
+      ON
+         a.user_id = b.user_id
+      WHERE
+         relationship_birthday ilike '%${todayString}';
+   `;
 
+   return fetchALL(QUERY)
+}
 
 module.exports = {
    registerUser,
@@ -173,5 +191,6 @@ module.exports = {
    editUserLang,
    addReview,
    foundUserRelationship,
-   addUserRelationship
+   addUserRelationship,
+   foundRelationship
 }
