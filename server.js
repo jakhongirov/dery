@@ -11,7 +11,8 @@ const cron = require('node-cron');
 const { v4: uuidv4 } = require('uuid');
 const { bot } = require('./src/lib/bot')
 const model = require('./model')
-const { formatNumber, checkBirthdays } = require('./src/lib/functions')
+const { formatNumber, checkBirthdays } = require('./src/lib/functions');
+const { assert } = require('console');
 
 const publicFolderPath = path.join(__dirname, 'public');
 const imagesFolderPath = path.join(publicFolderPath, 'images');
@@ -30,14 +31,14 @@ if (!fs.existsSync(imagesFolderPath)) {
    console.log('Images folder already exists within the public folder.');
 }
 
-cron.schedule('0 0 * * *', async () => {
-   console.log('Running check every minute');
-   checkBirthdays()
-});
+// cron.schedule('0 0 * * *', async () => {
+//    console.log('Running check every minute');
+//    checkBirthdays()
+// });
 
-(async () => {
-   await checkBirthdays();
-})();
+// (async () => {
+//    await checkBirthdays();
+// })();
 
 // START
 bot.onText(/\/start/, async msg => {
@@ -1396,6 +1397,10 @@ bot.on("message", async msg => {
 })
 
 //  ORDER
+let products_id = []
+let clientLatitude;
+let clientLongitude;
+
 bot.on("message", async msg => {
    const chatId = msg.chat.id
    const text = msg.text
@@ -1440,18 +1445,64 @@ bot.on("message", async msg => {
             resize_keyboard: true
          })
       })
-   } else if (text = "🏃 Olib ketish") {
+   } else if (text == "🏃 Olib ketish") {
       const categories = await model.categories()
       const latitude = 41.330722;
       const longitude = 69.304972;
+      const inlineKeyboard = categories.map(category => {
+         return [{ text: category.category_name_uz, callback_data: category.category_id }];
+      });
 
       bot.sendLocation(chatId, latitude, longitude)
-      bot.sendMessage(chatId, "Nimadan boshlaymiz?", {
+      bot.sendMessage(chatId, "Kategoriyani tanlang?", {
          reply_markup: {
-            inline_keyboard: [
-
-            ]
+            inline_keyboard: inlineKeyboard
          }
+      })
+   }
+})
+
+
+bot.on("location", async msg => {
+   const chatId = msg.chat.id;
+   const location = msg.location;
+   clientLatitude = location.latitude
+   clientLongitude = location.longitude
+
+   const categories = await model.categories()
+   const inlineKeyboard = categories.map(category => {
+      return [{ text: category.category_name_uz, callback_data: category.category_id }];
+   });
+
+   bot.sendMessage(chatId, "Kategoriyani tanlang", {
+      reply_markup: {
+         inline_keyboard: inlineKeyboard
+      }
+   })
+})
+
+bot.on("callback_query", async msg => {
+   const id = msg.data
+   const chatId = msg.message.chat.id
+   const foundUserByChatId = await model.foundUserByChatId(chatId)
+   const productsListByCategoryId = await model.productsListByCategoryId(id)
+
+   if (foundUserByChatId?.user_lang == "uz") {
+      const inlineKeyboard = productsListByCategoryId.map(e => {
+         return [{ text: e.product_name_uz, callback_data: e.product_id }];
+      });
+      bot.sendMessage(chatId, "Taomni tanlang", {
+         reply_markup: {
+            inline_keyboard: inlineKeyboard
+         }
+      }).then(payload => {
+         const replyListenerId = bot.on('callback_query', msg => {
+            bot.removeListener(replyListenerId)
+            
+            console.log(msg.data)
+
+            bot.sendMessage(chatId,'aa')
+         })
       })
    }
 })

@@ -182,6 +182,32 @@ const foundRelationship = (todayString) => {
 
    return fetchALL(QUERY)
 }
+const categories = () => {
+   const QUERY = `
+      SELECT
+         *
+      FROM
+         categories
+      ORDER BY
+         category_id DESC;
+   `;
+
+   return fetchALL(QUERY)
+}
+const productsListByCategoryId = (category_id) => {
+   const QUERY = `
+      SELECT
+         *
+      FROM
+         products
+      WHERE
+         category_id = $1
+      ORDER BY
+         product_id DESC;
+   `;
+
+   return fetchALL(QUERY, category_id)
+}
 
 module.exports = {
    registerUser,
@@ -192,5 +218,7 @@ module.exports = {
    addReview,
    foundUserRelationship,
    addUserRelationship,
-   foundRelationship
+   foundRelationship,
+   categories,
+   productsListByCategoryId
 }
