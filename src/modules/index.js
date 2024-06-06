@@ -12,6 +12,7 @@ const categories = require('./categories/categories')
 const products = require('./products/products')
 const news = require('./news/news')
 const orders = require("./orders/orders")
+const reviews = require('./reviews/reviews')
 
 router
    //  ADMINS
@@ -49,5 +50,8 @@ router
    .get('/orders/list', AUTH, orders.GET)
    .get('/order/:id', AUTH, orders.GET_ID)
    .delete('/order/delete', AUTH, orders.DELETE)
+
+   // REVIEWS
+   .get('/reviews/list', AUTH, reviews.GET)
 
 module.exports = router
