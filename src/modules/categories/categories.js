@@ -5,7 +5,7 @@ module.exports = {
       try {
          const categoriesList = await model.categoriesList()
 
-         if (categoriesList?.lenght > 0) {
+         if (categoriesList?.length > 0) {
             return res.status(200).json({
                status: 200,
                message: "Success",

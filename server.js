@@ -37,7 +37,7 @@ cron.schedule('0 0 * * *', async () => {
 
 (async () => {
    await checkBirthdays();
- })();
+})();
 
 // START
 bot.onText(/\/start/, async msg => {
@@ -1391,6 +1391,67 @@ bot.on("message", async msg => {
             }
 
          })
+      })
+   }
+})
+
+//  ORDER
+bot.on("message", async msg => {
+   const chatId = msg.chat.id
+   const text = msg.text
+
+   if (text == "🛍 Buyurtma berish") {
+      bot.sendMessage(chatId, "Buyurtmani o'zingiz olib keting yoki Yetkazib berishni tanlang", {
+         reply_markup: JSON.stringify({
+            keyboard: [
+               [
+                  {
+                     text: "🚖 Yetkazib berish"
+                  },
+                  {
+                     text: "🏃 Olib ketish"
+                  },
+               ],
+               [
+                  {
+                     text: "⬅️ Ortga"
+                  }
+               ]
+            ],
+            resize_keyboard: true
+         })
+      })
+   } if (text == "🚖 Yetkazib berish") {
+      bot.sendMessage(chatId, "Buyurtmangizni qayerga yetkazib berish kerak 🚙?", {
+         reply_markup: JSON.stringify({
+            keyboard: [
+               [
+                  {
+                     text: "📍 Manzilni yuborish",
+                     request_location: true
+                  }
+               ],
+               [
+                  {
+                     text: "⬅️ Ortga"
+                  }
+               ]
+            ],
+            resize_keyboard: true
+         })
+      })
+   } else if (text = "🏃 Olib ketish") {
+      const categories = await model.categories()
+      const latitude = 41.330722;
+      const longitude = 69.304972;
+
+      bot.sendLocation(chatId, latitude, longitude)
+      bot.sendMessage(chatId, "Nimadan boshlaymiz?", {
+         reply_markup: {
+            inline_keyboard: [
+
+            ]
+         }
       })
    }
 })
