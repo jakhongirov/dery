@@ -11,6 +11,7 @@ const users = require('./users/users')
 const categories = require('./categories/categories')
 const products = require('./products/products')
 const news = require('./news/news')
+const orders = require("./orders/orders")
 
 router
    //  ADMINS
@@ -43,5 +44,10 @@ router
    .get('/news/:id', AUTH, news.GET_ID)
    .post('/news/add', FileUpload.single('image'), news.ADD_NEWS)
    .delete('/news/delete', AUTH, news.DELETE)
+
+   // ORDERS
+   .get('/orders/list', AUTH, orders.GET)
+   .get('/order/:id', AUTH, orders.GET_ID)
+   .delete('/order/delete', AUTH, orders.DELETE)
 
 module.exports = router
