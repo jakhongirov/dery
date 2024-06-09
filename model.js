@@ -194,6 +194,19 @@ const categories = () => {
 
    return fetchALL(QUERY)
 }
+const foundCategory = (text) => {
+   const QUERY = `
+      SELECT
+         *
+      FROM
+         categories
+      WHERE
+         category_name_uz = $1
+         or category_name_ru = $1;
+   `;
+
+   return fetch(QUERY, text)
+}
 const productsListByCategoryId = (category_id) => {
    const QUERY = `
       SELECT
@@ -208,6 +221,18 @@ const productsListByCategoryId = (category_id) => {
 
    return fetchALL(QUERY, category_id)
 }
+const foundProduct = (id) => {
+   const QUERY = `
+      SELECT
+         *
+      FROM
+         products
+      WHERE
+         product_id = $1;
+   `;
+
+   return fetch(QUERY, id)
+}
 
 module.exports = {
    registerUser,
@@ -220,5 +245,7 @@ module.exports = {
    addUserRelationship,
    foundRelationship,
    categories,
-   productsListByCategoryId
+   foundCategory,
+   productsListByCategoryId,
+   foundProduct
 }

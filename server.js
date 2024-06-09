@@ -1449,15 +1449,16 @@ bot.on("message", async msg => {
       const categories = await model.categories()
       const latitude = 41.330722;
       const longitude = 69.304972;
-      const inlineKeyboard = categories.map(category => {
-         return [{ text: category.category_name_uz, callback_data: category.category_id }];
+      const categoriesKeyboard = categories.map(category => {
+         return [{ text: category.category_name_uz }];
       });
 
       bot.sendLocation(chatId, latitude, longitude)
       bot.sendMessage(chatId, "Kategoriyani tanlang?", {
-         reply_markup: {
-            inline_keyboard: inlineKeyboard
-         }
+         reply_markup: JSON.stringify({
+            keyboard: categoriesKeyboard,
+            resize_keyboard: true
+         })
       })
    }
 })
@@ -1470,40 +1471,68 @@ bot.on("location", async msg => {
    clientLongitude = location.longitude
 
    const categories = await model.categories()
-   const inlineKeyboard = categories.map(category => {
-      return [{ text: category.category_name_uz, callback_data: category.category_id }];
+   const categoriesKeyboard = categories.map(category => {
+      return [{ text: category.category_name_uz }];
    });
 
    bot.sendMessage(chatId, "Kategoriyani tanlang", {
-      reply_markup: {
-         inline_keyboard: inlineKeyboard
-      }
+      reply_markup: JSON.stringify({
+         keyboard: categoriesKeyboard,
+         resize_keyboard: true
+      })
    })
 })
 
-bot.on("callback_query", async msg => {
-   const id = msg.data
-   const chatId = msg.message.chat.id
+bot.on("message", async msg => {
+   const chatId = msg.chat.id
+   const text = msg.text
    const foundUserByChatId = await model.foundUserByChatId(chatId)
-   const productsListByCategoryId = await model.productsListByCategoryId(id)
+   const foundCategory = await model.foundCategory(text)
 
-   if (foundUserByChatId?.user_lang == "uz") {
+   if (foundUserByChatId?.user_lang == "uz" && foundCategory) {
+
+      const productsListByCategoryId = await model.productsListByCategoryId(foundCategory?.category_id)
       const inlineKeyboard = productsListByCategoryId.map(e => {
          return [{ text: e.product_name_uz, callback_data: e.product_id }];
       });
       bot.sendMessage(chatId, "Taomni tanlang", {
          reply_markup: {
-            inline_keyboard: inlineKeyboard
+            inline_keyboard: inlineKeyboard,
          }
       }).then(payload => {
-         const replyListenerId = bot.on('callback_query', msg => {
+         const replyListenerId = bot.on('callback_query', async msg => {
             bot.removeListener(replyListenerId)
-            
-            console.log(msg.data)
+            const foundProduct = await model.foundProduct(msg.data)
+            const content = `<strong>${foundProduct?.product_name_uz}</strong>\n\n${foundProduct?.product_description_uz}\n${formatNumber(foundProduct?.product_price)} sum`
 
-            bot.sendMessage(chatId,'aa')
+            bot.sendMessage(chatId, content, {
+               parse_mode: "HTML",
+               reply_markup: JSON.stringify({
+                  keyboard: [
+                     [
+                        {
+                           text: 1
+                        },
+                        {
+                           text: 2
+                        },
+                        {
+                           text: 3
+                        },
+                        {
+                           text: 4
+                        }
+                     ],
+                     [
+                       { text: "Davom ettirish"}
+                     ]
+                  ],
+                  resize_keyboard: true
+               })
+            })
          })
       })
+
    }
 })
 
