@@ -9,7 +9,7 @@ const productsList = (limit, page) => {
       ORDER BY
          product_id DESC
       LIMIT ${Number(limit)}
-      OFFSET ${Number((page = 1) * limit)};
+      OFFSET ${Number((page - 1) * limit)};
    `;
 
    return fetchALL(QUERY)
