@@ -31,14 +31,14 @@ if (!fs.existsSync(imagesFolderPath)) {
    console.log('Images folder already exists within the public folder.');
 }
 
-// cron.schedule('0 0 * * *', async () => {
-//    console.log('Running check every minute');
-//    checkBirthdays()
-// });
+cron.schedule('0 0 * * *', async () => {
+   console.log('Running check every minute');
+   checkBirthdays()
+});
 
-// (async () => {
-//    await checkBirthdays();
-// })();
+(async () => {
+   await checkBirthdays();
+})();
 
 // START
 bot.onText(/\/start/, async msg => {
