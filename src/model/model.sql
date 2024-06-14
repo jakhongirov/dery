@@ -10,6 +10,8 @@ CREATE TABLE users (
    user_name text not null,
    user_phone text not null,
    user_gender text not null,
+   user_birthday text,
+   user_age int,
    user_chat_id text not null,
    user_referral_bonus text,
    user_referral_bonus_image_url text,
@@ -26,6 +28,8 @@ CREATE TABLE users_relationship (
    id bigserial PRIMARY KEY,
    relationship_name text,
    relationship_birthday text,
+   relationship_age int,
+   relationship_gender text,
    user_id int REFERENCES users(user_id) ON DELETE CASCADE,
    relationship_create_at timestamptz DEFAULT CURRENT_TIMESTAMP
 );
@@ -63,7 +67,7 @@ CREATE TABLE news (
 
 CREATE TABLE orders (
    order_id bigserial PRIMARY KEY,
-   order_product_id int [],
+   order_product_id json [],
    user_id int REFERENCES users(user_id) ON DELETE CASCADE,
    order_total_price int,
    order_started boolean DEFAULT false,

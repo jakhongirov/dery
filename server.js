@@ -11,8 +11,7 @@ const cron = require('node-cron');
 const { v4: uuidv4 } = require('uuid');
 const { bot } = require('./src/lib/bot')
 const model = require('./model')
-const { formatNumber, checkBirthdays } = require('./src/lib/functions');
-const { assert } = require('console');
+const { formatNumber, checkBirthdays, calculateAge } = require('./src/lib/functions');
 
 const publicFolderPath = path.join(__dirname, 'public');
 const imagesFolderPath = path.join(publicFolderPath, 'images');
@@ -147,6 +146,7 @@ bot.on('callback_query', async msg => {
    let requestGender;
    let requestContact;
    let requestDay;
+   let requestAge;
 
    if (lang == 'uz') {
       if (foundUserByChatId) {
@@ -210,6 +210,7 @@ bot.on('callback_query', async msg => {
 
                         if (msg.text) {
                            requestDay = msg.text
+                           requestAge = calculateAge(msg.text)
 
                            bot.sendMessage(msg.chat.id, `${requestName}, jinsni tanlang`, {
                               reply_markup: JSON.stringify({
@@ -258,7 +259,7 @@ bot.on('callback_query', async msg => {
                                              const personal_code = uuidv4();
                                              const referral_code = uuidv4();
 
-                                             if (requestName && requestGender && requestContact) {
+                                             if (requestName && requestGender && requestContact && requestDay) {
 
                                                 QRCode.toFile(`./public/images/qrcode_personal_${chatId}.png`, personal_code, {}, async (err) => {
                                                    if (err) throw err;
@@ -272,6 +273,8 @@ bot.on('callback_query', async msg => {
                                                 const registerUser = await model.registerUser(
                                                    requestName,
                                                    requestGender,
+                                                   requestDay,
+                                                   requestAge,
                                                    `+${requestContact}`,
                                                    chatId,
                                                    personal_code,
@@ -393,6 +396,7 @@ bot.on('callback_query', async msg => {
 
                         if (msg.text) {
                            requestDay = msg.text
+                           requestAge = calculateAge(msg.text)
 
                            bot.sendMessage(msg.chat.id, `${requestName}, выберите пол`, {
                               reply_markup: JSON.stringify({
@@ -441,7 +445,7 @@ bot.on('callback_query', async msg => {
                                              const personal_code = uuidv4();
                                              const referral_code = uuidv4();
 
-                                             if (requestName && requestGender && requestContact) {
+                                             if (requestName && requestGender && requestContact && requestDay) {
 
                                                 QRCode.toFile(`./public/images/qrcode_personal_${chatId}.png`, personal_code, {}, async (err) => {
                                                    if (err) throw err;
@@ -455,6 +459,8 @@ bot.on('callback_query', async msg => {
                                                 const registerUser = await model.registerUser(
                                                    requestName,
                                                    requestGender,
+                                                   requestDay,
+                                                   requestAge,
                                                    `+${requestContact}`,
                                                    chatId,
                                                    personal_code,
@@ -862,28 +868,28 @@ bot.on('message', async msg => {
             keyboard: [
                [
                   {
-                     text: "🛍 Заказать"
+                     text: "🛍 Buyurtma berish"
                   }
                ],
                [
                   {
-                     text: "✍️ Оставить отзыв"
+                     text: "✍️ Fikr bildirish"
                   },
                   {
-                     text: "💸 Накопитель"
+                     text: "💸 Jamg'arma"
                   }
                ],
                [
                   {
-                     text: "ℹ️ Информация"
+                     text: "ℹ️ Maʼlumot"
                   },
                   {
-                     text: "⚙️ Настройки"
+                     text: "⚙️ Sozlamalar"
                   }
                ],
                [
                   {
-                     text: "👥 Мои близкие"
+                     text: "👥 Yaqinlarim"
                   }
                ]
             ],
@@ -1236,6 +1242,8 @@ bot.on("message", async msg => {
    } else if (text == "➕ Qo'shish") {
       let requestName
       let requestBirthday
+      let requestGender
+      let requestAge
 
       bot.sendMessage(chatId, "Ismini yozing", {
          reply_markup: {
@@ -1248,7 +1256,7 @@ bot.on("message", async msg => {
             if (msg.text) {
                requestName = msg.text
 
-               bot.sendMessage(msg.chat.id, "Tug'ilgan kunini yozing, ss.oo", {
+               bot.sendMessage(msg.chat.id, "Tug'ilgan kunini yozing, ss.oo.yyyy", {
                   reply_markup: {
                      force_reply: true
                   }
@@ -1259,40 +1267,71 @@ bot.on("message", async msg => {
 
                      if (msg.text) {
                         requestBirthday = msg.text
+                        requestAge = calculateAge(msg.text)
 
-                        if (requestName && requestBirthday) {
-                           const foundUserByChatId = await model.foundUserByChatId(chatId)
-                           const addUserRelationship = await model.addUserRelationship(
-                              requestName,
-                              requestBirthday,
-                              foundUserByChatId?.user_id
-                           )
+                        bot.sendMessage(msg.chat.id, `Jinsini tanlang`, {
+                           reply_markup: JSON.stringify({
+                              keyboard:
+                                 [
+                                    [
+                                       {
+                                          text: 'Erkak',
+                                          force_reply: true
+                                       },
+                                       {
+                                          text: 'Ayol',
+                                          force_reply: true
+                                       }
+                                    ]
+                                 ],
+                              resize_keyboard: true
+                           })
+                        }).then(payload => {
+                           const replyListenerId = bot.on('message', async msg => {
+                              bot.removeListener(replyListenerId)
 
-                           if (addUserRelationship) {
-                              bot.sendMessage(chatId, "Muvaffaqiyatli qo'shildi", {
-                                 reply_markup: JSON.stringify({
-                                    keyboard: [
-                                       [
-                                          {
-                                             text: "👥 Ro'yxat"
-                                          }
-                                       ],
-                                       [
-                                          {
-                                             text: "➕ Qo'shish"
-                                          }
-                                       ],
-                                       [
-                                          {
-                                             text: "⬅️ Ortga"
-                                          }
-                                       ]
-                                    ],
-                                    resize_keyboard: true
-                                 })
-                              })
-                           }
-                        }
+                              if (msg.text) {
+                                 requestGender = msg.text
+
+                                 if (requestName && requestBirthday && requestAge && requestGender) {
+
+                                    const foundUserByChatId = await model.foundUserByChatId(chatId)
+                                    const addUserRelationship = await model.addUserRelationship(
+                                       requestName,
+                                       requestBirthday,
+                                       requestAge,
+                                       requestGender,
+                                       foundUserByChatId?.user_id
+                                    )
+
+                                    if (addUserRelationship) {
+                                       bot.sendMessage(chatId, "Muvaffaqiyatli qo'shildi", {
+                                          reply_markup: JSON.stringify({
+                                             keyboard: [
+                                                [
+                                                   {
+                                                      text: "👥 Ro'yxat"
+                                                   }
+                                                ],
+                                                [
+                                                   {
+                                                      text: "➕ Qo'shish"
+                                                   }
+                                                ],
+                                                [
+                                                   {
+                                                      text: "⬅️ Ortga"
+                                                   }
+                                                ]
+                                             ],
+                                             resize_keyboard: true
+                                          })
+                                       })
+                                    }
+                                 }
+                              }
+                           })
+                        })
                      }
                   })
                })
@@ -1301,6 +1340,7 @@ bot.on("message", async msg => {
          })
       })
    } else if (text == "👥 Мои близкие") {
+
       bot.sendMessage(chatId, '👥 Мои близкие', {
          reply_markup: JSON.stringify({
             keyboard: [
@@ -1359,6 +1399,8 @@ bot.on("message", async msg => {
    } else if (text == "➕ Добавить") {
       let requestName
       let requestBirthday
+      let requestGender
+      let requestAge
 
       bot.sendMessage(chatId, "Напишите имя", {
          reply_markup: {
@@ -1371,7 +1413,7 @@ bot.on("message", async msg => {
             if (msg.text) {
                requestName = msg.text
 
-               bot.sendMessage(msg.chat.id, "Напишите дату рождения, дд.мм", {
+               bot.sendMessage(msg.chat.id, "Напишите дату рождения дд.мм.гггг", {
                   reply_markup: {
                      force_reply: true
                   }
@@ -1379,42 +1421,74 @@ bot.on("message", async msg => {
                   const replyListenerId = bot.onReplyToMessage(payload.chat.id, payload.message_id, async (msg) => {
                      bot.removeListener(replyListenerId)
 
+
                      if (msg.text) {
                         requestBirthday = msg.text
+                        requestAge = calculateAge(msg.text)
 
-                        if (requestName && requestBirthday) {
-                           const foundUserByChatId = await model.foundUserByChatId(chatId)
-                           const addUserRelationship = await model.addUserRelationship(
-                              requestName,
-                              requestBirthday,
-                              foundUserByChatId?.user_id
-                           )
+                        bot.sendMessage(msg.chat.id, `Выберите пол`, {
+                           reply_markup: JSON.stringify({
+                              keyboard:
+                                 [
+                                    [
+                                       {
+                                          text: 'Мужской',
+                                          force_reply: true
+                                       },
+                                       {
+                                          text: 'Женщина',
+                                          force_reply: true
+                                       }
+                                    ]
+                                 ],
+                              resize_keyboard: true
+                           })
+                        }).then(payload => {
+                           const replyListenerId = bot.on('message', async msg => {
+                              bot.removeListener(replyListenerId)
 
-                           if (addUserRelationship) {
-                              bot.sendMessage(chatId, "Добавлено успешно", {
-                                 reply_markup: JSON.stringify({
-                                    keyboard: [
-                                       [
-                                          {
-                                             text: "👥 Список"
-                                          }
-                                       ],
-                                       [
-                                          {
-                                             text: "➕ Добавить"
-                                          }
-                                       ],
-                                       [
-                                          {
-                                             text: "⬅️ Назад"
-                                          }
-                                       ]
-                                    ],
-                                    resize_keyboard: true
-                                 })
-                              })
-                           }
-                        }
+                              if (msg.text) {
+                                 requestGender = msg.text
+
+                                 if (requestName && requestBirthday && requestAge && requestGender) {
+
+                                    const foundUserByChatId = await model.foundUserByChatId(chatId)
+                                    const addUserRelationship = await model.addUserRelationship(
+                                       requestName,
+                                       requestBirthday,
+                                       requestAge,
+                                       requestGender,
+                                       foundUserByChatId?.user_id
+                                    )
+
+                                    if (addUserRelationship) {
+                                       bot.sendMessage(chatId, "Добавлено успешно", {
+                                          reply_markup: JSON.stringify({
+                                             keyboard: [
+                                                [
+                                                   {
+                                                      text: "👥 Список"
+                                                   }
+                                                ],
+                                                [
+                                                   {
+                                                      text: "➕ Добавить"
+                                                   }
+                                                ],
+                                                [
+                                                   {
+                                                      text: "⬅️ Назад"
+                                                   }
+                                                ]
+                                             ],
+                                             resize_keyboard: true
+                                          })
+                                       })
+                                    }
+                                 }
+                              }
+                           })
+                        })
                      }
                   })
                })
@@ -1426,10 +1500,6 @@ bot.on("message", async msg => {
 })
 
 //  ORDER
-let products_id = []
-let clientLatitude;
-let clientLongitude;
-
 bot.on("message", async msg => {
    const chatId = msg.chat.id
    const text = msg.text
@@ -1492,78 +1562,97 @@ bot.on("message", async msg => {
    }
 })
 
-
-bot.on("location", async msg => {
-   const chatId = msg.chat.id;
-   const location = msg.location;
-   clientLatitude = location.latitude
-   clientLongitude = location.longitude
-
-   const categories = await model.categories()
-   const categoriesKeyboard = categories.map(category => {
-      return [{ text: category.category_name_uz }];
-   });
-
-   bot.sendMessage(chatId, "Kategoriyani tanlang", {
-      reply_markup: JSON.stringify({
-         keyboard: categoriesKeyboard,
-         resize_keyboard: true
-      })
-   })
-})
+// let products_id = []
+let clientLatitude;
+let clientLongitude;
+let product = {};
+const userStates = {}; // This will hold the state of each user
+const products_id = [];
 
 bot.on("message", async msg => {
-   const chatId = msg.chat.id
-   const text = msg.text
-   const foundUserByChatId = await model.foundUserByChatId(chatId)
-   const foundCategory = await model.foundCategory(text)
+   const chatId = msg.chat.id;
+   const text = msg.text;
 
-   if (foundUserByChatId?.user_lang == "uz" && foundCategory) {
+   // Initialize user state if not present
+   if (!userStates[chatId]) {
+      userStates[chatId] = {
+         lang: null,
+         currentCategory: null,
+         currentProduct: null
+      };
+   }
 
-      const productsListByCategoryId = await model.productsListByCategoryId(foundCategory?.category_id)
+   const foundUserByChatId = await model.foundUserByChatId(chatId);
+   if (foundUserByChatId) {
+      userStates[chatId].lang = foundUserByChatId.user_lang;
+   }
+
+   const foundCategory = await model.foundCategory(text);
+   if (foundCategory && userStates[chatId].lang == "uz") {
+      userStates[chatId].currentCategory = foundCategory;
+
+      const productsListByCategoryId = await model.productsListByCategoryId(foundCategory.category_id);
       const inlineKeyboard = productsListByCategoryId.map(e => {
          return [{ text: e.product_name_uz, callback_data: e.product_id }];
       });
+
       bot.sendMessage(chatId, "Taomni tanlang", {
          reply_markup: {
             inline_keyboard: inlineKeyboard,
          }
-      }).then(payload => {
-         const replyListenerId = bot.on('callback_query', async msg => {
-            bot.removeListener(replyListenerId)
-            const foundProduct = await model.foundProduct(msg.data)
-            const content = `<strong>${foundProduct?.product_name_uz}</strong>\n\n${foundProduct?.product_description_uz}\n${formatNumber(foundProduct?.product_price)} sum`
+      });
 
-            bot.sendMessage(chatId, content, {
-               parse_mode: "HTML",
-               reply_markup: JSON.stringify({
-                  keyboard: [
-                     [
-                        {
-                           text: 1
-                        },
-                        {
-                           text: 2
-                        },
-                        {
-                           text: 3
-                        },
-                        {
-                           text: 4
-                        }
-                     ],
-                     [
-                        { text: "Davom ettirish" }
-                     ]
-                  ],
-                  resize_keyboard: true
-               })
-            })
-         })
-      })
+   } else if (userStates[chatId].currentCategory && !isNaN(Number(text))) {
+      const count = Number(text);
 
+      if (!isNaN(count) && count > 0) {
+         userStates[chatId].currentProduct.count = count;
+         products_id.push(userStates[chatId].currentProduct);
+         userStates[chatId].currentProduct = null;
+
+         const categories = await model.categories();
+         const categoriesKeyboard = categories.map(category => {
+            return [{ text: category.category_name_uz }];
+         });
+
+         console.log(userStates);
+         console.log(products_id);
+         bot.sendMessage(chatId, "Savaga qo'shildi", {
+            reply_markup: {
+               keyboard: categoriesKeyboard,
+               resize_keyboard: true
+            }
+         });
+      }
    }
-})
+});
+
+bot.on("callback_query", async callbackQuery => {
+   const chatId = callbackQuery.message.chat.id;
+   const productId = callbackQuery.data;
+
+   const foundProduct = await model.foundProduct(productId);
+   if (foundProduct) {
+      const product = {
+         id: foundProduct.product_id,
+         count: 0
+      };
+      userStates[chatId].currentProduct = product;
+
+      const content = `<strong>${foundProduct.product_name_uz}</strong>\n\n${foundProduct.product_description_uz}\n${formatNumber(foundProduct.product_price)} sum`;
+      bot.sendMessage(chatId, content, {
+         parse_mode: "HTML",
+         reply_markup: {
+            keyboard: [
+               [{ text: '1' }, { text: '2' }, { text: '3' }, { text: '4' }],
+               [{ text: "Davom ettirish" }]
+            ],
+            resize_keyboard: true
+         }
+      });
+   }
+});
+
 
 app.use(cors({ origin: "*" }))
 app.use(express.json());

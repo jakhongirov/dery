@@ -23,7 +23,30 @@ const checkBirthdays = async () => {
    }
 }
 
+const calculateAge = (birthday) => {
+   const parts = birthday.split(".");
+   const day = parseInt(parts[0], 10);
+   const month = parseInt(parts[1], 10) - 1;
+   const year = parseInt(parts[2], 10);
+
+   const birthDate = new Date(year, month, day);
+   const today = new Date();
+
+   let age = today.getFullYear() - birthDate.getFullYear();
+   const monthDifference = today.getMonth() - birthDate.getMonth();
+
+   if (
+      monthDifference < 0 ||
+      (monthDifference === 0 && today.getDate() < birthDate.getDate())
+   ) {
+      age--;
+   }
+
+   return age;
+}
+
 module.exports = {
    formatNumber,
-   checkBirthdays
+   checkBirthdays,
+   calculateAge
 }

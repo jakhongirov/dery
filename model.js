@@ -3,6 +3,8 @@ const { fetch, fetchALL } = require('./src/lib/postgres')
 const registerUser = (
    requestName,
    requestGender,
+   requestDay,
+   requestAge,
    requestContact,
    chatId,
    personal_code,
@@ -18,6 +20,8 @@ const registerUser = (
          users (
             user_name,
             user_gender,
+            user_birthday,
+            user_age,
             user_phone,
             user_chat_id,
             user_personal,
@@ -38,7 +42,9 @@ const registerUser = (
             $8,
             $9,
             $10,
-            $11
+            $11,
+            $12,
+            $13
          ) RETURNING *;
    `;
 
@@ -46,6 +52,8 @@ const registerUser = (
       QUERY,
       requestName,
       requestGender,
+      requestDay,
+      requestAge,
       requestContact,
       chatId,
       personal_code,
@@ -141,6 +149,8 @@ const foundUserRelationship = (user_id) => {
 const addUserRelationship = (
    requestName,
    requestBirthday,
+   requestAge,
+   requestGender,
    user_id
 ) => {
    const QUERY = `
@@ -148,6 +158,8 @@ const addUserRelationship = (
          users_relationship (
             relationship_name,
             relationship_birthday,
+            relationship_age,
+            relationship_gender,
             user_id
          ) VALUES (
             $1,
@@ -160,6 +172,8 @@ const addUserRelationship = (
       QUERY,
       requestName,
       requestBirthday,
+      requestAge,
+      requestGender,
       user_id
    )
 }
