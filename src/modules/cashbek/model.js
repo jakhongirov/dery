@@ -35,7 +35,7 @@ const addCashbekUserBalance = (user_id, cashbek) => {
          user_cashbek = $2 + user_cashbek
       WHERE
          user_id = $1
-      RETUNRING *;
+      RETURNING *;
    `;
 
    return fetch(QUERY, user_id, cashbek)
@@ -81,7 +81,7 @@ const removekUserBalance = (user_id, amount) => {
          user_cashbek = user_cashbek - $2
       WHERE
          user_id = $1
-      RETUNRING *;
+      RETURNING *;
    `;
 
    return fetch(QUERY, user_id, amount)
