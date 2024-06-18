@@ -102,16 +102,17 @@ module.exports = {
 
          if (addNews) {
             usersList?.forEach(e => {
+               const imagePath = path.resolve(__dirname, '..', '..', '..', 'public', 'images', imgName);
                if (e?.user_lang == 'uz') {
-                  bot.sendPhoto(e?.user_chat_id, fs.readFileSync(path.resolve(__dirname, '..', '..', '..', 'public', 'images', `${imgName}`)), {
+                  bot.sendPhoto(e?.user_chat_id, fs.readFileSync(imagePath), {
                      parse_mode: "HTML",
                      caption: `<strong>${news_title_uz}</strong>\n\n${news_description_uz}`
-                  })
+                  });
                } else if (e?.user_lang == 'ru') {
-                  bot.sendPhoto(e?.user_chat_id, fs.readFileSync(path.resolve(__dirname, '..', '..', '..', 'public', 'images', `${imgName}`)), {
+                  bot.sendPhoto(e?.user_chat_id, fs.readFileSync(imagePath), {
                      parse_mode: "HTML",
                      caption: `<strong>${news_title_ru}</strong>\n\n${news_description_ru}`
-                  })
+                  });
                }
             });
 
