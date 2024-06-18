@@ -101,7 +101,6 @@ module.exports = {
          )
 
          if (addNews) {
-            console.log(imgName)
             usersList?.forEach(e => {
                const imagePath = path.resolve(__dirname, '..', '..', '..', 'public', 'images', imgName);
                if (e?.user_lang == 'uz') {
