@@ -45,8 +45,13 @@ const calculateAge = (birthday) => {
    return age;
 }
 
+const calculatePercentage = (amount, percentage) => {
+   return (amount * percentage) / 100;
+}
+
 module.exports = {
    formatNumber,
    checkBirthdays,
-   calculateAge
+   calculateAge,
+   calculatePercentage
 }

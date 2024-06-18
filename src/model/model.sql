@@ -81,3 +81,13 @@ CREATE TABLE reviews (
    user_id int REFERENCES users(user_id) ON DELETE CASCADE,
    review_create_at timestamptz DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE cashbek (
+   id bigserial PRIMARY KEY,
+   user_id int REFERENCES users(user_id) ON DELETE CASCADE,
+   amount int,
+   type text,
+   cashbek_category text,
+   cashbek_code text,
+   cashbek_create_at timestamptz DEFAULT CURRENT_TIMESTAMP
+);
