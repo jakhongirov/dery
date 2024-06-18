@@ -52,9 +52,9 @@ const addCashbek = (
          cashbek (
             user_id,
             amount,
-            cashbek_code
+            cashbek_code,
             type,
-            cashbek_category,
+            cashbek_category
          ) VALUES (
             $1,
             $2,
