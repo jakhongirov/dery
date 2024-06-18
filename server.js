@@ -1500,6 +1500,8 @@ bot.on("message", async msg => {
 })
 
 //  ORDER
+let deleviry = false;
+
 bot.on("message", async msg => {
    const chatId = msg.chat.id
    const text = msg.text
@@ -1526,6 +1528,7 @@ bot.on("message", async msg => {
          })
       })
    } else if (text == "🚖 Yetkazib berish") {
+      deleviry = true
       bot.sendMessage(chatId, "Buyurtmangizni qayerga yetkazib berish kerak 🚙?", {
          reply_markup: JSON.stringify({
             keyboard: [
@@ -1551,6 +1554,8 @@ bot.on("message", async msg => {
       const categoriesKeyboard = categories.map(category => {
          return [{ text: category.category_name_uz }];
       });
+      categoriesKeyboard.push([{ text: "Savat" }])
+      categoriesKeyboard.push([{ text: "⬅️ Ortga" }])
 
       bot.sendLocation(chatId, latitude, longitude)
       bot.sendMessage(chatId, "Kategoriyani tanlang?", {
@@ -1581,6 +1586,7 @@ bot.on("message", async msg => {
          })
       })
    } else if (text == "🚖 Доставка") {
+      deleviry = true
       bot.sendMessage(chatId, "Куда доставить ваш заказ 🚙?", {
          reply_markup: JSON.stringify({
             keyboard: [
@@ -1599,6 +1605,23 @@ bot.on("message", async msg => {
             resize_keyboard: true
          })
       })
+   } else if (text == "🏃 Забрать") {
+      const categories = await model.categories()
+      const latitude = 41.330722;
+      const longitude = 69.304972;
+      const categoriesKeyboard = categories.map(category => {
+         return [{ text: category.category_name_uz }];
+      });
+      categoriesKeyboard.push([{ text: "Корзина" }])
+      categoriesKeyboard.push([{ text: "⬅️ Назад" }])
+
+      bot.sendLocation(chatId, latitude, longitude)
+      bot.sendMessage(chatId, "Выберите категорию", {
+         reply_markup: JSON.stringify({
+            keyboard: categoriesKeyboard,
+            resize_keyboard: true
+         })
+      })
    }
 })
 
@@ -1608,6 +1631,7 @@ let clientLongitude;
 let product = {};
 const userStates = {}; // This will hold the state of each user
 const products_id = [];
+
 
 bot.on("location", async msg => {
    const chatId = msg.chat.id;
@@ -1622,6 +1646,8 @@ bot.on("location", async msg => {
       const categoriesKeyboard = categories.map(category => {
          return [{ text: category.category_name_uz }];
       });
+      categoriesKeyboard.push([{ text: "Savat" }])
+      categoriesKeyboard.push([{ text: "⬅️ Ortga" }])
 
       bot.sendMessage(chatId, "Kategoriyani tanlang", {
          reply_markup: JSON.stringify({
@@ -1633,6 +1659,8 @@ bot.on("location", async msg => {
       const categoriesKeyboard = categories.map(category => {
          return [{ text: category.category_name_uz }];
       });
+      categoriesKeyboard.push([{ text: "Корзина" }])
+      categoriesKeyboard.push([{ text: "⬅️ Назад" }])
 
       bot.sendMessage(chatId, "Выберите категорию", {
          reply_markup: JSON.stringify({
@@ -1694,7 +1722,8 @@ bot.on("message", async msg => {
       const count = Number(text);
 
       if (!isNaN(count) && count > 0) {
-         userStates[chatId].currentProduct.count = count;
+         userStates[chatId].currentProduct['count'] = count;
+         userStates[chatId].currentProduct['total'] = Number(count * userStates[chatId].currentProduct['product_price']);
          products_id.push(userStates[chatId].currentProduct);
          userStates[chatId].currentProduct = null;
 
@@ -1708,6 +1737,9 @@ bot.on("message", async msg => {
          });
 
          if (foundUserByChatId.user_lang == 'uz') {
+            categoriesKeyboard.push([{ text: "Savat" }])
+            categoriesKeyboard.push([{ text: "⬅️ Ortga" }])
+
             bot.sendMessage(chatId, "Savatga qo'shildi", {
                reply_markup: {
                   keyboard: categoriesKeyboard,
@@ -1715,6 +1747,9 @@ bot.on("message", async msg => {
                }
             });
          } else if (foundUserByChatId.user_lang == 'ru') {
+            categoriesKeyboard.push([{ text: "Корзина" }])
+            categoriesKeyboard.push([{ text: "⬅️ Назад" }])
+
             bot.sendMessage(chatId, "Добавлено в корзину", {
                reply_markup: {
                   keyboard: categoriesKeyboard,
@@ -1730,40 +1765,147 @@ bot.on("callback_query", async callbackQuery => {
    const chatId = callbackQuery.message.chat.id;
    const productId = callbackQuery.data;
 
-   const foundProduct = await model.foundProduct(productId);
-   if (foundProduct) {
-      const product = {
-         id: foundProduct.product_id,
-         count: 0
-      };
-      userStates[chatId].currentProduct = product;
+   if (!isNaN(Number(productId))) {
+      const foundProduct = await model.foundProduct(productId);
+      if (foundProduct) {
+         const product = foundProduct;
+         userStates[chatId].currentProduct = product;
 
-      if (userStates[chatId].lang == "uz") {
-         const content = `<strong>${foundProduct.product_name_uz}</strong>\n\n${foundProduct.product_description_uz}\n${formatNumber(foundProduct.product_price)} sum`;
-         bot.sendMessage(chatId, content, {
-            parse_mode: "HTML",
-            reply_markup: {
-               keyboard: [
-                  [{ text: '1' }, { text: '2' }, { text: '3' }, { text: '4' }]
-               ],
-               resize_keyboard: true
-            }
-         });
-      } else if (userStates[chatId].lang == "ru") {
-         const content = `<strong>${foundProduct.product_name_ru}</strong>\n\n${foundProduct.product_description_ru}\n${formatNumber(foundProduct.product_price)} сум`;
-         bot.sendMessage(chatId, content, {
-            parse_mode: "HTML",
-            reply_markup: {
-               keyboard: [
-                  [{ text: '1' }, { text: '2' }, { text: '3' }, { text: '4' }]
-               ],
-               resize_keyboard: true
-            }
-         });
+         if (userStates[chatId].lang == "uz") {
+            const content = `<strong>${foundProduct.product_name_uz}</strong>\n\n${foundProduct.product_description_uz}\n${formatNumber(foundProduct.product_price)} sum`;
+            bot.sendMessage(chatId, content, {
+               parse_mode: "HTML",
+               reply_markup: {
+                  keyboard: [
+                     [{ text: '1' }, { text: '2' }, { text: '3' }, { text: '4' }]
+                  ],
+                  resize_keyboard: true
+               }
+            });
+         } else if (userStates[chatId].lang == "ru") {
+            const content = `<strong>${foundProduct.product_name_ru}</strong>\n\n${foundProduct.product_description_ru}\n${formatNumber(foundProduct.product_price)} сум`;
+            bot.sendMessage(chatId, content, {
+               parse_mode: "HTML",
+               reply_markup: {
+                  keyboard: [
+                     [{ text: '1' }, { text: '2' }, { text: '3' }, { text: '4' }]
+                  ],
+                  resize_keyboard: true
+               }
+            });
+         }
+
       }
-
    }
 });
+
+bot.on("message", async msg => {
+   const chatId = msg.chat.id;
+   const text = msg.text;
+
+   if (text == "Savat") {
+      if (products_id?.length > 0) {
+         const products = products_id.map((e, index) => `${index + 1}. ${e.product_name_uz} - ${formatNumber(Number(e.total))} sum`).join("\n");
+         const totalAmount = products_id
+            .reduce((acc, e) => acc + Number(e.total), 0);
+
+         if (deleviry) {
+            bot.sendMessage(chatId, `${products}\nYetkazib berish - 20 000 sum\nJami: ${formatNumber(totalAmount + 20000)} sum`, {
+               reply_markup: JSON.stringify({
+                  keyboard: [
+                     [
+                        { text: "Tasdiqlash" }
+                     ],
+                     [
+                        { text: "Bekor qilish" }
+                     ],
+                  ],
+                  resize_keyboard: true
+               })
+            })
+         } else {
+            bot.sendMessage(chatId, `${products}\nJami: ${formatNumber(totalAmount)} sum`, {
+               reply_markup: JSON.stringify({
+                  keyboard: [
+                     [
+                        { text: "Tasdiqlash" }
+                     ],
+                     [
+                        { text: "Bekor qilish" }
+                     ],
+                  ],
+                  resize_keyboard: true
+               })
+            })
+         }
+
+      } else {
+         bot.sendMessage(chatId, "Savat bo'sh", {
+            reply_markup: JSON.stringify({
+               keyboard: [
+                  [
+                     {
+                        text: "⬅️ Ortga"
+                     }
+                  ]
+               ],
+               resize_keyboard: true
+            })
+         })
+      }
+   } else if (text == "Корзина") {
+      if (products_id?.length > 0) {
+         const products = products_id.map((e, index) => `${index + 1}. ${e.product_name_ru} - ${formatNumber(Number(e.total))} сум`).join("\n");
+         const totalAmount = products_id
+            .reduce((acc, e) => acc + Number(e.total), 0);
+
+         if (deleviry) {
+            bot.sendMessage(chatId, `${products}\nДоставка - 20 000 сум\Общий: ${formatNumber(totalAmount + 20000)} сум`, {
+               reply_markup: JSON.stringify({
+                  keyboard: [
+                     [
+                        { text: "Подтвердить" }
+                     ],
+                     [
+                        { text: "Отмена" }
+                     ],
+                  ],
+                  resize_keyboard: true
+               })
+            })
+         } else {
+            bot.sendMessage(chatId, `${products}\nОбщий: ${formatNumber(totalAmount)} сум`, {
+               reply_markup: JSON.stringify({
+                  keyboard: [
+                     [
+                        { text: "Подтвердить" }
+                     ],
+                     [
+                        { text: "Отмена" }
+                     ],
+                  ],
+                  resize_keyboard: true
+               })
+            })
+         }
+
+      } else {
+         bot.sendMessage(chatId, "Корзина пуста", {
+            reply_markup: JSON.stringify({
+               keyboard: [
+                  [
+                     {
+                        text: "⬅️ Назад"
+                     }
+                  ]
+               ],
+               resize_keyboard: true
+            })
+         })
+      }
+   }
+
+})
 
 app.use(cors({ origin: "*" }))
 app.use(express.json());
