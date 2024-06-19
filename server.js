@@ -1684,12 +1684,15 @@ bot.on("message", async msg => {
       };
    }
 
-   const foundUserByChatId = await model.foundUserByChatId(chatId);
-   if (foundUserByChatId) {
-      userStates[chatId].lang = foundUserByChatId.user_lang;
+   const foundCategory = await model.foundCategory(text);
+
+   if (foundCategory) {
+      const foundUserByChatId = await model.foundUserByChatId(chatId);
+      if (foundUserByChatId) {
+         userStates[chatId].lang = foundUserByChatId.user_lang;
+      }
    }
 
-   const foundCategory = await model.foundCategory(text);
    if (foundCategory && userStates[chatId].lang == "uz") {
       userStates[chatId].currentCategory = foundCategory;
 
@@ -1722,6 +1725,7 @@ bot.on("message", async msg => {
       const count = Number(text);
 
       if (!isNaN(count) && count > 0) {
+         const foundUserByChatId = await model.foundUserByChatId(chatId);
          userStates[chatId].currentProduct['count'] = count;
          userStates[chatId].currentProduct['total'] = Number(count * userStates[chatId].currentProduct['product_price']);
          products_id.push(userStates[chatId].currentProduct);
