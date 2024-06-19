@@ -1690,6 +1690,7 @@ bot.on("message", async msg => {
       const foundUserByChatId = await model.foundUserByChatId(chatId);
       if (foundUserByChatId) {
          userStates[chatId].lang = foundUserByChatId.user_lang;
+         userStates[chatId].user_phone = foundUserByChatId.user_phone;
       }
    }
 
@@ -1827,6 +1828,7 @@ bot.on("message", async msg => {
                   resize_keyboard: true
                })
             })
+
          } else {
             bot.sendMessage(chatId, `${products}\nJami: ${formatNumber(totalAmount)} sum`, {
                reply_markup: JSON.stringify({
@@ -1958,6 +1960,13 @@ bot.on("message", async msg => {
                resize_keyboard: true
             })
          })
+
+         if (deleviry) {
+            bot.sendLocation(5926167059, clientLatitude, clientLongitude)
+            bot.sendMessage(5926167059, `${products}\nYetkazib berish - 20 000 sum\nJami: ${formatNumber(totalAmount + 20000)} sum\n${foundUserByChatId?.user_phone}`,)
+         } else {
+            bot.sendMessage(5926167059, `${products}\nnJami: ${formatNumber(totalAmount + 20000)} sum\n${foundUserByChatId?.user_phone}\nOlib ketish`,)
+         }
       }
 
    } else if (text == "Bekor qilish") {
@@ -2039,6 +2048,13 @@ bot.on("message", async msg => {
                resize_keyboard: true
             })
          })
+
+         if (deleviry) {
+            bot.sendLocation(5926167059, clientLatitude, clientLongitude)
+            bot.sendMessage(5926167059, `${products}\nYetkazib berish - 20 000 sum\nJami: ${formatNumber(totalAmount + 20000)} sum\n${foundUserByChatId?.user_phone}`,)
+         } else {
+            bot.sendMessage(5926167059, `${products}\nnJami: ${formatNumber(totalAmount + 20000)} sum\n${foundUserByChatId?.user_phone}\nOlib ketish`,)
+         }
       }
    } else if (text == "Отмена") {
       products_id.length = 0;
