@@ -8,7 +8,7 @@ module.exports = {
          if (limit && page) {
             const ordersList = await model.ordersList(limit, page)
 
-            if (ordersList?.lenght > 0) {
+            if (ordersList?.length > 0) {
                return res.status(200).json({
                   status: 200,
                   message: "Success",
