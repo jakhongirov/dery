@@ -1904,7 +1904,174 @@ bot.on("message", async msg => {
          })
       }
    }
+})
 
+bot.on("message", async msg => {
+   const chatId = msg.chat.id;
+   const text = msg.text;
+
+   if (text == "Tasdiqlash") {
+      const totalAmount = products_id
+         .reduce((acc, e) => acc + Number(e.total), 0);
+      const foundUserByChatId = await model.foundUserByChatId(chatId)
+      const addOrder = await model.addOrder(
+         foundUserByChatId?.user_id,
+         products_id,
+         totalAmount
+      )
+
+      if (addOrder) {
+         bot.sendMessage(chatId, "Buyurtmangiz qabul qilindi", {
+            reply_markup: JSON.stringify({
+               keyboard: [
+                  [
+                     {
+                        text: "🛍 Buyurtma berish"
+                     }
+                  ],
+                  [
+                     {
+                        text: "✍️ Fikr bildirish"
+                     },
+                     {
+                        text: "💸 Jamg'arma"
+                     }
+                  ],
+                  [
+                     {
+                        text: "ℹ️ Maʼlumot"
+                     },
+                     {
+                        text: "⚙️ Sozlamalar"
+                     }
+                  ],
+                  [
+                     {
+                        text: "👥 Yaqinlarim"
+                     }
+                  ]
+               ],
+               resize_keyboard: true
+            })
+         })
+      }
+
+   } else if (text == "Bekor qilish") {
+      products_id.length = 0;
+      bot.sendMessage(chatId, "Buyurtmangiz bekor qilindi", {
+         reply_markup: JSON.stringify({
+            keyboard: [
+               [
+                  {
+                     text: "🛍 Buyurtma berish"
+                  }
+               ],
+               [
+                  {
+                     text: "✍️ Fikr bildirish"
+                  },
+                  {
+                     text: "💸 Jamg'arma"
+                  }
+               ],
+               [
+                  {
+                     text: "ℹ️ Maʼlumot"
+                  },
+                  {
+                     text: "⚙️ Sozlamalar"
+                  }
+               ],
+               [
+                  {
+                     text: "👥 Yaqinlarim"
+                  }
+               ]
+            ],
+            resize_keyboard: true
+         })
+      })
+   } else if (text == "Подтвердить") {
+      const totalAmount = products_id
+         .reduce((acc, e) => acc + Number(e.total), 0);
+      const foundUserByChatId = await model.foundUserByChatId(chatId)
+      const addOrder = await model.addOrder(
+         foundUserByChatId?.user_id,
+         products_id,
+         totalAmount
+      )
+
+      if (addOrder) {
+         bot.sendMessage(chatId, "Ваш заказ принят", {
+            reply_markup: JSON.stringify({
+               keyboard: [
+                  [
+                     {
+                        text: "🛍 Заказать"
+                     }
+                  ],
+                  [
+                     {
+                        text: "✍️ Оставить отзыв"
+                     },
+                     {
+                        text: "💸 Накопитель"
+                     }
+                  ],
+                  [
+                     {
+                        text: "ℹ️ Информация"
+                     },
+                     {
+                        text: "⚙️ Настройки"
+                     }
+                  ],
+                  [
+                     {
+                        text: "👥 Мои близкие"
+                     }
+                  ]
+               ],
+               resize_keyboard: true
+            })
+         })
+      }
+   } else if (text == "Отмена") {
+      products_id.length = 0;
+      bot.sendMessage(chatId, "Ваш заказ был отменен", {
+         reply_markup: JSON.stringify({
+            keyboard: [
+               [
+                  {
+                     text: "🛍 Заказать"
+                  }
+               ],
+               [
+                  {
+                     text: "✍️ Оставить отзыв"
+                  },
+                  {
+                     text: "💸 Накопитель"
+                  }
+               ],
+               [
+                  {
+                     text: "ℹ️ Информация"
+                  },
+                  {
+                     text: "⚙️ Настройки"
+                  }
+               ],
+               [
+                  {
+                     text: "👥 Мои близкие"
+                  }
+               ]
+            ],
+            resize_keyboard: true
+         })
+      })
+   }
 })
 
 app.use(cors({ origin: "*" }))

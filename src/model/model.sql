@@ -67,7 +67,7 @@ CREATE TABLE news (
 
 CREATE TABLE orders (
    order_id bigserial PRIMARY KEY,
-   order_product_id json [],
+   order_products json [],
    user_id int REFERENCES users(user_id) ON DELETE CASCADE,
    order_total_price int,
    order_started boolean DEFAULT false,

@@ -247,6 +247,33 @@ const foundProduct = (id) => {
 
    return fetch(QUERY, id)
 }
+const addOrder = (
+   user_id,
+   products_id,
+   totalAmount
+) => {
+   const QUERY = `
+      INSERT INTO
+         orders (
+            user_id,
+            order_products,
+            order_total_price,
+            order_started
+         ) VALUES (
+            $1,
+            $2,
+            $3.
+            true
+         ) RETURNING *;
+   `;
+
+   return fetch(
+      QUERY,
+      user_id,
+      products_id,
+      totalAmount
+   )
+}
 
 module.exports = {
    registerUser,
@@ -261,5 +288,6 @@ module.exports = {
    categories,
    foundCategory,
    productsListByCategoryId,
-   foundProduct
+   foundProduct,
+   addOrder
 }
