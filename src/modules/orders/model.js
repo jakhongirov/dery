@@ -3,7 +3,6 @@ const { fetch, fetchALL } = require('../../lib/postgres')
 const ordersList = (limit, page) => {
    const QUERY = `
       SELECT
-         order_product_id,
          a.user_id,
          user_name,
          user_phone,

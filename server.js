@@ -1866,7 +1866,7 @@ bot.on("message", async msg => {
             .reduce((acc, e) => acc + Number(e.total), 0);
 
          if (deleviry) {
-            bot.sendMessage(chatId, `${products}\nДоставка - 20 000 сум\Общий: ${formatNumber(totalAmount + 20000)} сум`, {
+            bot.sendMessage(chatId, `${products}\nДоставка - 20 000 сум\nОбщий: ${formatNumber(totalAmount + 20000)} сум`, {
                reply_markup: JSON.stringify({
                   keyboard: [
                      [
@@ -1917,6 +1917,7 @@ bot.on("message", async msg => {
    const text = msg.text;
 
    if (text == "Tasdiqlash") {
+      const products = products_id.map((e, index) => `${index + 1}. ${e.product_name_uz} - ${formatNumber(Number(e.total))} сум`).join("\n");
       const totalAmount = products_id
          .reduce((acc, e) => acc + Number(e.total), 0);
       const foundUserByChatId = await model.foundUserByChatId(chatId)
@@ -1965,7 +1966,7 @@ bot.on("message", async msg => {
             bot.sendLocation(5926167059, clientLatitude, clientLongitude)
             bot.sendMessage(5926167059, `${products}\nYetkazib berish - 20 000 sum\nJami: ${formatNumber(totalAmount + 20000)} sum\n${foundUserByChatId?.user_phone}`,)
          } else {
-            bot.sendMessage(5926167059, `${products}\nnJami: ${formatNumber(totalAmount + 20000)} sum\n${foundUserByChatId?.user_phone}\nOlib ketish`,)
+            bot.sendMessage(5926167059, `${products}\nJami: ${formatNumber(totalAmount + 20000)} sum\n${foundUserByChatId?.user_phone}\nOlib ketish`,)
          }
       }
 
@@ -2005,6 +2006,7 @@ bot.on("message", async msg => {
          })
       })
    } else if (text == "Подтвердить") {
+      const products = products_id.map((e, index) => `${index + 1}. ${e.product_name_ru} - ${formatNumber(Number(e.total))} сум`).join("\n");
       const totalAmount = products_id
          .reduce((acc, e) => acc + Number(e.total), 0);
       const foundUserByChatId = await model.foundUserByChatId(chatId)
@@ -2051,9 +2053,9 @@ bot.on("message", async msg => {
 
          if (deleviry) {
             bot.sendLocation(5926167059, clientLatitude, clientLongitude)
-            bot.sendMessage(5926167059, `${products}\nYetkazib berish - 20 000 sum\nJami: ${formatNumber(totalAmount + 20000)} sum\n${foundUserByChatId?.user_phone}`,)
+            bot.sendMessage(5926167059, `${products}\nДоставка - 20 000 сум.\nОбщий: ${formatNumber(totalAmount + 20000)} sum\n${foundUserByChatId?.user_phone}`,)
          } else {
-            bot.sendMessage(5926167059, `${products}\nnJami: ${formatNumber(totalAmount + 20000)} sum\n${foundUserByChatId?.user_phone}\nOlib ketish`,)
+            bot.sendMessage(5926167059, `${products}\nОбщий: ${formatNumber(totalAmount + 20000)} sum\n${foundUserByChatId?.user_phone}\nЗабрать`,)
          }
       }
    } else if (text == "Отмена") {

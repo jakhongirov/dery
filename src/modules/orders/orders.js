@@ -43,9 +43,7 @@ module.exports = {
 
          if (id) {
             const foundOrder = await model.foundOrder(id)
-            const foundProducts = await model.foundProducts(foundOrder?.order_product_id)
-            foundOrder['products'] = foundProducts
-            
+
             if (foundOrder) {
                return res.status(200).json({
                   status: 200,
