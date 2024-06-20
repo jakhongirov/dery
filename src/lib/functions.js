@@ -17,12 +17,13 @@ const checkBirthdays = async () => {
       checkDate.setDate(today.getDate() + i);
       const day = String(checkDate.getDate()).padStart(2, '0');
       const month = String(checkDate.getMonth() + 1).padStart(2, '0');
-      datesToCheck.push(`${day}.${month}`);
+      datesToCheck.push(`${day}.${month}.`);
    }
 
    for (let i = 0; i < datesToCheck.length; i++) {
       const date = datesToCheck[i];
       const foundRelationship = await model.foundRelationship(date);
+      console.log(foundRelationship, date);
       if (foundRelationship?.length > 0) {
          foundRelationship.forEach(e => {
             birthdayList.push({

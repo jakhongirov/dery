@@ -194,7 +194,7 @@ const foundRelationship = (todayString) => {
       ON
          a.user_id = b.user_id
       WHERE
-         relationship_birthday ilike '%${todayString}';
+         relationship_birthday ilike '%${todayString}%';
    `;
 
    return fetchALL(QUERY)
