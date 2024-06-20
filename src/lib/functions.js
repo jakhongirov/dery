@@ -45,6 +45,8 @@ const checkBirthdays = async () => {
       }
    }
 
+   console.log(birthdayList);
+
    const list = birthdayList.map((person, index) => `${index + 1}. ${person.name} - ${person.birthday} tug'ilgan, yaqinini nomeri ${person.phone}`).join("\n");
 
    // Send the consolidated list

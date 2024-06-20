@@ -31,7 +31,7 @@ if (!fs.existsSync(imagesFolderPath)) {
    console.log('Images folder already exists within the public folder.');
 }
 
-cron.schedule('30 0 * * *', async () => {
+cron.schedule('35 0 * * *', async () => {
    const now = moment().tz('Asia/Tashkent');
    console.log('Running check at 12:00 AM Uzbekistan time:', now.format());
    await checkBirthdays();
