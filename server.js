@@ -1924,7 +1924,8 @@ bot.on("message", async msg => {
       const addOrder = await model.addOrder(
          foundUserByChatId?.user_id,
          products_id,
-         totalAmount
+         totalAmount,
+         deleviry
       )
 
       if (addOrder) {
@@ -2013,7 +2014,8 @@ bot.on("message", async msg => {
       const addOrder = await model.addOrder(
          foundUserByChatId?.user_id,
          products_id,
-         totalAmount
+         totalAmount,
+         deleviry
       )
 
       if (addOrder) {

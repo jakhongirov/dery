@@ -250,7 +250,8 @@ const foundProduct = (id) => {
 const addOrder = (
    user_id,
    products_id,
-   totalAmount
+   totalAmount,
+   deleviry
 ) => {
    const QUERY = `
       INSERT INTO
@@ -258,12 +259,14 @@ const addOrder = (
             user_id,
             order_products,
             order_total_price,
-            order_started
+            order_started,
+            deleviry
          ) VALUES (
             $1,
             $2,
             $3,
-            true
+            true,
+            $4
          ) RETURNING *;
    `;
 
@@ -271,7 +274,8 @@ const addOrder = (
       QUERY,
       user_id,
       products_id,
-      totalAmount
+      totalAmount,
+      deleviry
    )
 }
 

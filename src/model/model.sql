@@ -72,6 +72,7 @@ CREATE TABLE orders (
    order_total_price int,
    order_started boolean DEFAULT false,
    order_finished boolean DEFAULT false,
+   order_delivery boolean DEFAULT false,
    order_create_at timestamptz DEFAULT CURRENT_TIMESTAMP
 );
 
