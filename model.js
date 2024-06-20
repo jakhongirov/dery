@@ -185,7 +185,8 @@ const foundRelationship = (todayString) => {
          user_lang,
          user_chat_id,
          relationship_name,
-         relationship_birthday
+         relationship_birthday,
+         user_phone
       FROM
          users_relationship a
       INNER JOIN
