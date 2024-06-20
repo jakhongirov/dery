@@ -8,6 +8,7 @@ const fs = require('fs');
 const path = require('path')
 const QRCode = require('qrcode');
 const cron = require('node-cron');
+const moment = require('moment-timezone');
 const { v4: uuidv4 } = require('uuid');
 const { bot } = require('./src/lib/bot')
 const model = require('./model')
@@ -31,11 +32,18 @@ if (!fs.existsSync(imagesFolderPath)) {
 }
 
 cron.schedule('0 0 * * *', async () => {
-   console.log('Running check every minute');
-   checkBirthdays()
+   const now = moment().tz('Asia/Tashkent');
+   console.log('Running check at 12:00 AM Uzbekistan time:', now.format());
+   await checkBirthdays();
+}, {
+   scheduled: true,
+   timezone: "Asia/Tashkent"
 });
 
+// Immediately invoke the function with the current Uzbekistan time
 (async () => {
+   const now = moment().tz('Asia/Tashkent');
+   console.log('Immediate check at:', now.format());
    await checkBirthdays();
 })();
 

@@ -6,9 +6,11 @@ const formatNumber = (number) => {
 }
 
 const checkBirthdays = async () => {
-   const today = new Date();
+   const uzbekistanOffset = 5 * 60; // Uzbekistan is UTC+5
+   const todayUTC = new Date();
+   const today = new Date(todayUTC.getTime() + uzbekistanOffset * 60 * 1000);
    const datesToCheck = [];
-   const birthdayList = []
+   const birthdayList = [];
 
    for (let i = 0; i < 3; i++) {
       const checkDate = new Date(today);
@@ -21,10 +23,17 @@ const checkBirthdays = async () => {
    for (let i = 0; i < datesToCheck.length; i++) {
       const date = datesToCheck[i];
       const foundRelationship = await model.foundRelationship(date);
-      birthdayList.push(...foundRelationship)
-
       if (foundRelationship?.length > 0) {
          foundRelationship.forEach(e => {
+            birthdayList.push({
+               name: e?.relationship_name,
+               birthday: e?.relationship_birthday,
+               phone: e?.user_phone,
+               userLang: e?.user_lang,
+               chatId: e?.user_chat_id,
+               offset: i
+            });
+
             if (i === 0) { // Today
                if (e.user_lang == "uz") {
                   bot.sendMessage(e.user_chat_id, `Bugun ${e?.relationship_name}ning tavallud ayyomlari🎉`);
@@ -36,10 +45,13 @@ const checkBirthdays = async () => {
       }
    }
 
-   const list = birthdayList.map((person, index) => `${index + 1}. ${person?.relationship_name} - ${person?.relationship_birthday} tug'ilgan, yaqinini nomeri ${person?.user_phone}`).join("\n")
+   const list = birthdayList.map((person, index) => `${index + 1}. ${person.name} - ${person.birthday} tug'ilgan, yaqinini nomeri ${person.phone}`).join("\n");
 
-   bot.sendMessage(5926167059, list)
+   // Send the consolidated list
+   bot.sendMessage(5926167059, list);
 }
+
+
 
 const calculateAge = (birthday) => {
    const parts = birthday.split(".");
