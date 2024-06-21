@@ -1957,8 +1957,12 @@ bot.on("message", async msg => {
          totalAmount,
          deleviry
       )
+      const cashbek = calculatePercentage(totalAmount, 5)
+      const addCashbekUserBalance = await model.addCashbekUserBalance(foundUserByChatId?.user_id, cashbek)
+      const addCashbek = await model.addCashbek(foundUserByChatId?.user_id, cashbek, foundUserByChatId?.user_personal, "income", "Personal bonus")
 
-      if (addOrder) {
+      if (addOrder && addCashbek && addCashbekUserBalance) {
+         bot.sendMessage(chatId, `Keshbek: ${formatNumber(cashbek)} sum`)
          bot.sendMessage(chatId, "Buyurtmangiz qabul qilindi", {
             reply_markup: JSON.stringify({
                keyboard: [
@@ -2047,8 +2051,12 @@ bot.on("message", async msg => {
          totalAmount,
          deleviry
       )
+      const cashbek = calculatePercentage(totalAmount, 5)
+      const addCashbekUserBalance = await model.addCashbekUserBalance(foundUserByChatId?.user_id, cashbek)
+      const addCashbek = await model.addCashbek(foundUserByChatId?.user_id, cashbek, foundUserByChatId?.user_personal, "income", "Personal bonus")
 
-      if (addOrder) {
+      if (addOrder && addCashbekUserBalance && addCashbek) {
+         bot.sendMessage(chatId, `Кэшбэк: ${formatNumber(cashbek)} sum`)
          bot.sendMessage(chatId, "Ваш заказ принят", {
             reply_markup: JSON.stringify({
                keyboard: [

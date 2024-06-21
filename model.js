@@ -281,6 +281,52 @@ const addOrder = (
       deleviry
    )
 }
+const addCashbekUserBalance = (user_id, cashbek) => {
+   const QUERY = `
+      UPDATE
+         users
+      SET
+         user_cashbek = $2 + user_cashbek
+      WHERE
+         user_id = $1
+      RETURNING *;
+   `;
+
+   return fetch(QUERY, user_id, cashbek)
+}
+const addCashbek = (
+   user_id,
+   cashbek,
+   code,
+   type,
+   category
+) => {
+   const QUERY = `
+      INSERT INTO
+         cashbek (
+            user_id,
+            amount,
+            cashbek_code,
+            type,
+            cashbek_category
+         ) VALUES (
+            $1,
+            $2,
+            $3,
+            $4,
+            $5
+         ) RETURNING *;
+   `;
+
+   return fetch(
+      QUERY,
+      user_id,
+      cashbek,
+      code,
+      type,
+      category
+   )
+}
 
 module.exports = {
    registerUser,
@@ -296,5 +342,7 @@ module.exports = {
    foundCategory,
    productsListByCategoryId,
    foundProduct,
-   addOrder
+   addOrder,
+   addCashbekUserBalance,
+   addCashbek
 }
