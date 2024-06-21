@@ -9,7 +9,6 @@ const path = require('path')
 const QRCode = require('qrcode');
 const cron = require('node-cron');
 const moment = require('moment-timezone');
-const fetch = require('node-fetch');
 const { v4: uuidv4 } = require('uuid');
 const { bot } = require('./src/lib/bot')
 const model = require('./model')
@@ -48,6 +47,8 @@ cron.schedule('0 0 * * *', async () => {
    await checkBirthdays();
 })();
 
+const fetch = require('node-fetch');
+
 async function sendKeepAlive() {
    try {
       const response = await fetch(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/getMe`);
@@ -63,6 +64,9 @@ async function sendKeepAlive() {
 
 // Set up keep-alive interval (every 5 minutes)
 setInterval(sendKeepAlive, 5 * 60 * 1000);
+
+// Call sendKeepAlive immediately to test the connection at startup
+sendKeepAlive();
 
 // START
 bot.onText(/\/start/, async msg => {
