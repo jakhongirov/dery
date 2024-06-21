@@ -12,7 +12,7 @@ const moment = require('moment-timezone');
 const { v4: uuidv4 } = require('uuid');
 const { bot } = require('./src/lib/bot')
 const model = require('./model')
-const { formatNumber, checkBirthdays, calculateAge } = require('./src/lib/functions');
+const { formatNumber, checkBirthdays, calculateAge, calculatePercentage } = require('./src/lib/functions');
 
 const publicFolderPath = path.join(__dirname, 'public');
 const imagesFolderPath = path.join(publicFolderPath, 'images');

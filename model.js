@@ -262,7 +262,7 @@ const addOrder = (
             user_id,
             order_products,
             order_total_price,
-            deleviry,
+            order_delivery,
             order_started
          ) VALUES (
             $1,
