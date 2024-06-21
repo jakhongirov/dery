@@ -262,14 +262,14 @@ const addOrder = (
             user_id,
             order_products,
             order_total_price,
-            order_started,
-            deleviry
+            deleviry,
+            order_started
          ) VALUES (
             $1,
             $2,
             $3,
-            true,
-            $4
+            $4,
+            true
          ) RETURNING *;
    `;
 
