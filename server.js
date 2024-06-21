@@ -2112,4 +2112,12 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/public', express.static(path.resolve(__dirname, 'public')))
 app.use("/api/v1", router);
 
+app.get('/telegrambot', (_, res) => {
+   try {
+      return res.json({ message: "Success" })
+   } catch (e) {
+      console.log(e)
+   }
+})
+
 app.listen(PORT, console.log(PORT));
