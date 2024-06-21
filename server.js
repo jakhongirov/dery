@@ -47,12 +47,12 @@ cron.schedule('0 0 * * *', async () => {
    await checkBirthdays();
 })();
 
-const fetch = require('node-fetch');
+const axios = require('axios');
 
 async function sendKeepAlive() {
    try {
-      const response = await fetch(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/getMe`);
-      if (!response.ok) {
+      const response = await axios.get(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/getMe`);
+      if (response.status !== 200) {
          console.error(`Keep-alive failed: ${response.statusText}`);
       } else {
          console.log("Keep-alive successful");
@@ -67,6 +67,7 @@ setInterval(sendKeepAlive, 5 * 60 * 1000);
 
 // Call sendKeepAlive immediately to test the connection at startup
 sendKeepAlive();
+
 
 // START
 bot.onText(/\/start/, async msg => {
