@@ -79,7 +79,7 @@ const calculateAge = (birthday) => {
 }
 
 const calculatePercentage = (amount, percentage) => {
-   return (amount * percentage) / 100;
+   return Math.floor((amount * percentage) / 100);
 }
 
 module.exports = {
