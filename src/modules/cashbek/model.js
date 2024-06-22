@@ -3,9 +3,20 @@ const { fetch, fetchALL } = require('../../lib/postgres')
 const cashbekList = (limit, page) => {
    const QUERY = `
       SELECT
-         *
+         id,
+         user_id,
+         user_name,
+         user_phone,
+         amount,
+         type,
+         cashbek_category,
+         cashbek_create_at
       FROM
-         cashbek
+         cashbek a
+      INNER JOIN
+         users b
+      ON
+         a.user_id = b.user_id
       ORDER BY
          id DESC
       LIMIT ${limit}
