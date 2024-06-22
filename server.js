@@ -1579,10 +1579,15 @@ bot.on("message", async msg => {
          }
       } else {
          if (userStates[chatId].lang == "uz") {
-            bot.sendMessage(chatId, "Iltimos, to'g'ri miqdorni kiriting.");
+            if (!userStates[chatId].lastInputWasInvalid) {
+               bot.sendMessage(chatId, "Iltimos, to'g'ri miqdorni kiriting.");
+            }
          } else if (userStates[chatId].lang == "ru") {
-            bot.sendMessage(chatId, "Пожалуйста, введите правильное количество.");
+            if (!userStates[chatId].lastInputWasInvalid) {
+               bot.sendMessage(chatId, "Пожалуйста, введите правильное количество.");
+            }
          }
+         userStates[chatId].lastInputWasInvalid = true;
       }
    }
 });
