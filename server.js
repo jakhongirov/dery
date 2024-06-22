@@ -40,12 +40,12 @@ cron.schedule('0 0 * * *', async () => {
    timezone: "Asia/Tashkent"
 });
 
-// Immediately invoke the function with the current Uzbekistan time
-(async () => {
-   const now = moment().tz('Asia/Tashkent');
-   console.log('Immediate check at:', now.format());
-   await checkBirthdays();
-})();
+// // Immediately invoke the function with the current Uzbekistan time
+// (async () => {
+//    const now = moment().tz('Asia/Tashkent');
+//    console.log('Immediate check at:', now.format());
+//    await checkBirthdays();
+// })();
 
 const axios = require('axios');
 
@@ -169,390 +169,175 @@ bot.onText(/\/start/, async msg => {
 
 // REGISTER
 bot.on('callback_query', async msg => {
-   const lang = msg.data
-   const chatId = msg.message.chat.id
-   const foundUserByChatId = await model.foundUserByChatId(chatId)
+   const lang = msg.data;
+   const chatId = msg.message.chat.id;
+   const foundUserByChatId = await model.foundUserByChatId(chatId);
    let requestName;
    let requestGender;
    let requestContact;
    let requestDay;
    let requestAge;
 
-   if (lang == 'uz') {
-      if (foundUserByChatId) {
-         const editUserLang = await model.editUserLang(foundUserByChatId?.user_id, lang)
-
-         if (editUserLang) {
-            bot.sendMessage(chatId, `${foundUserByChatId?.user_name}! Birgalikda buyurtma beramizmi? 😃`, {
-               reply_markup: JSON.stringify({
-                  keyboard: [
-                     [
-                        {
-                           text: "🛍 Buyurtma berish"
-                        }
-                     ],
-                     [
-                        {
-                           text: "✍️ Fikr bildirish"
-                        },
-                        {
-                           text: "💸 Jamg'arma"
-                        }
-                     ],
-                     [
-                        {
-                           text: "ℹ️ Maʼlumot"
-                        },
-                        {
-                           text: "⚙️ Sozlamalar"
-                        }
-                     ],
-                     [
-                        {
-                           text: "👥 Yaqinlarim"
-                        }
-                     ]
-                  ],
-                  resize_keyboard: true
-               })
-            })
-         }
-
-      } else {
-         bot.sendMessage(chatId, 'Ismingizni yozing', {
-            reply_markup: {
-               force_reply: true
-            }
-         }).then(payload => {
-            const replyListenerId = bot.onReplyToMessage(payload.chat.id, payload.message_id, msg => {
-               bot.removeListener(replyListenerId)
-
-               if (msg.text) {
-                  requestName = msg.text
-
-                  bot.sendMessage(msg.chat.id, `🎂 ${requestName}, tavallud kuningiz bilan qachon tabriklashimiz mumkin? Sanani ss.oo.yyyy ko'rinishda kiriting.`, {
-                     reply_markup: {
-                        force_reply: true
-                     }
-                  }).then(payload => {
-                     const replyListenerId = bot.onReplyToMessage(payload.chat.id, payload.message_id, msg => {
-                        bot.removeListener(replyListenerId)
-
-                        if (msg.text) {
-                           requestDay = msg.text
-                           requestAge = calculateAge(msg.text)
-
-                           bot.sendMessage(msg.chat.id, `${requestName}, jinsni tanlang`, {
-                              reply_markup: JSON.stringify({
-                                 keyboard:
-                                    [
-                                       [
-                                          {
-                                             text: 'Erkak',
-                                             force_reply: true
-                                          },
-                                          {
-                                             text: 'Ayol',
-                                             force_reply: true
-                                          }
-                                       ]
-                                    ],
-                                 resize_keyboard: true
-                              })
-                           }).then(payload => {
-                              const replyListenerId = bot.on('message', msg => {
-                                 bot.removeListener(replyListenerId)
-
-                                 if (msg.text) {
-                                    requestGender = msg.text
-
-                                    bot.sendMessage(msg.chat.id, `${requestName}, Kontaktingizni yuboring`, {
-                                       reply_markup: JSON.stringify({
-                                          keyboard:
-                                             [
-                                                [
-                                                   {
-                                                      text: 'Kontaktni yuborish',
-                                                      request_contact: true,
-                                                      one_time_keyboard: true
-                                                   }
-                                                ]
-                                             ],
-                                          resize_keyboard: true
-                                       })
-                                    }).then(payload => {
-                                       const replyListenerId = bot.on("contact", async (msg) => {
-                                          bot.removeListener(replyListenerId)
-
-                                          if (msg.contact) {
-                                             requestContact = msg.contact.phone_number;
-                                             const personal_code = uuidv4();
-                                             const referral_code = uuidv4();
-
-                                             if (requestName && requestGender && requestContact && requestDay) {
-
-                                                QRCode.toFile(`./public/images/qrcode_personal_${chatId}.png`, personal_code, {}, async (err) => {
-                                                   if (err) throw err;
-                                                })
-
-                                                QRCode.toFile(`./public/images/qrcode_referral_${chatId}.png`, referral_code, {}, async (err) => {
-                                                   if (err) throw err;
-                                                })
-
-
-                                                const registerUser = await model.registerUser(
-                                                   requestName,
-                                                   requestGender,
-                                                   requestDay,
-                                                   requestAge,
-                                                   `+${requestContact}`,
-                                                   chatId,
-                                                   personal_code,
-                                                   referral_code,
-                                                   `${process.env.BACKEND_URL}/qrcode_personal_${chatId}.png`,
-                                                   `qrcode_personal_${chatId}.png`,
-                                                   `${process.env.BACKEND_URL}/qrcode_referral_${chatId}.png`,
-                                                   `qrcode_referral_${chatId}.png`,
-                                                   lang
-                                                )
-
-                                                if (registerUser) {
-                                                   bot.sendMessage(chatId, `${requestName}, muvaffaqiyatli ro'yxatdan o'tdingiz.`, {
-                                                      reply_markup: JSON.stringify({
-                                                         keyboard: [
-                                                            [
-                                                               {
-                                                                  text: "🛍 Buyurtma berish"
-                                                               }
-                                                            ],
-                                                            [
-                                                               {
-                                                                  text: "✍️ Fikr bildirish"
-                                                               },
-                                                               {
-                                                                  text: "💸 Jamg'arma"
-                                                               }
-                                                            ],
-                                                            [
-                                                               {
-                                                                  text: "ℹ️ Maʼlumot"
-                                                               },
-                                                               {
-                                                                  text: "⚙️ Sozlamalar"
-                                                               }
-                                                            ],
-                                                            [
-                                                               {
-                                                                  text: "👥 Yaqinlarim"
-                                                               }
-                                                            ]
-                                                         ],
-                                                         resize_keyboard: true
-                                                      })
-                                                   })
-                                                }
-                                             }
-                                          }
-                                       })
-                                    })
-                                 }
-                              })
-                           })
-                        }
-                     })
-                  })
-               }
-            })
+   const generateKeyboard = (options) => {
+      return {
+         reply_markup: JSON.stringify({
+            keyboard: options,
+            resize_keyboard: true
          })
+      };
+   };
+
+   const handleLanguage = async (lang, user) => {
+      const keyboardOptions = lang === 'uz' ? [
+         ["🛍 Buyurtma berish"],
+         ["✍️ Fikr bildirish", "💸 Jamg'arma"],
+         ["ℹ️ Maʼlumot", "⚙️ Sozlamalar"],
+         ["👥 Yaqinlarim"]
+      ] : [
+         ["🛍 Заказать"],
+         ["✍️ Оставить отзыв", "💸 Накопитель"],
+         ["ℹ️ Информация", "⚙️ Настройки"],
+         ["👥 Мои близкие"]
+      ];
+
+      const greeting = lang === 'uz' ? `${user?.user_name}! Birgalikda buyurtma beramizmi? 😃` : `${user?.user_name}! Оформим заказ вместе? 😃`;
+      bot.sendMessage(chatId, greeting, generateKeyboard(keyboardOptions));
+   };
+
+   const askName = async () => {
+      const langText = lang === 'uz' ? 'Ismingizni yozing' : 'Напишите свое имя';
+      bot.sendMessage(chatId, langText, { reply_markup: { force_reply: true } })
+         .then(payload => {
+            bot.onReplyToMessage(payload.chat.id, payload.message_id, async msg => {
+               requestName = msg.text;
+               await askBirthday();
+            });
+         });
+   };
+
+   const validateDate = (date) => {
+      const regex = /^\d{2}\.\d{2}\.\d{4}$/;
+      if (!regex.test(date)) return false;
+      const [day, month, year] = date.split('.').map(Number);
+      const dateObj = new Date(year, month - 1, day);
+      return dateObj.getDate() === day && dateObj.getMonth() === month - 1 && dateObj.getFullYear() === year;
+   };
+
+   const calculateAge = (date) => {
+      const [day, month, year] = date.split('.').map(Number);
+      const today = new Date();
+      let age = today.getFullYear() - year;
+      if (today.getMonth() + 1 < month || (today.getMonth() + 1 === month && today.getDate() < day)) {
+         age--;
       }
-   } else if (lang == 'ru') {
-      if (foundUserByChatId) {
-         const editUserLang = await model.editUserLang(foundUserByChatId?.user_id, lang)
+      return age;
+   };
 
+   const askBirthday = async () => {
+      const langText = lang === 'uz' ? `🎂 ${requestName}, tavallud kuningiz bilan qachon tabriklashimiz mumkin? Sanani ss.oo.yyyy ko'rinishda kiriting.` : `🎂 ${requestName}, когда мы можем поздравить тебя с днем ​​рождения? Введите дату в формате дд.мм.гггг`;
+      bot.sendMessage(chatId, langText, { reply_markup: { force_reply: true } })
+         .then(payload => {
+            bot.onReplyToMessage(payload.chat.id, payload.message_id, async msg => {
+               if (validateDate(msg.text)) {
+                  requestDay = msg.text;
+                  requestAge = calculateAge(msg.text);
+                  await askGender();
+               } else {
+                  const retryText = lang === 'uz' ? `Noto'g'ri format! Sanani ss.oo.yyyy ko'rinishda kiriting.` : `Неправильный формат! Введите дату в формате дд.мм.гггг`;
+                  bot.sendMessage(chatId, retryText);
+                  await askBirthday();
+               }
+            });
+         });
+   };
+
+   const askGender = async () => {
+      const langText = lang === 'uz' ? `${requestName}, jinsni tanlang` : `${requestName}, выберите пол`;
+      const genderOptions = lang === 'uz' ? ['Erkak', 'Ayol'] : ['Мужской', 'Женщина'];
+      bot.sendMessage(chatId, langText, generateKeyboard([genderOptions]))
+         .then(() => {
+            const genderListener = (msg) => {
+               if (msg.text === 'Erkak' || msg.text === 'Мужской') {
+                  requestGender = 'male';
+               } else if (msg.text === 'Ayol' || msg.text === 'Женщина') {
+                  requestGender = 'female';
+               }
+               if (requestGender) {
+                  bot.removeListener('message', genderListener);
+                  askContact();
+               }
+            };
+            bot.on('message', genderListener);
+         });
+   };
+
+   const askContact = async () => {
+      const langText = lang === 'uz' ? `${requestName}, Kontaktingizni yuboring` : `${requestName}, Отправьте свой контакт`;
+      bot.sendMessage(chatId, langText, generateKeyboard([
+         [{ text: lang === 'uz' ? 'Kontaktni yuborish' : 'Отправить контакт', request_contact: true, one_time_keyboard: true }]
+      ]))
+         .then(() => {
+            bot.on('contact', async msg => {
+               requestContact = msg.contact.phone_number;
+               await registerUser();
+            });
+         });
+   };
+
+   const registerUser = async () => {
+      const personal_code = uuidv4();
+      const referral_code = uuidv4();
+      const personalQRCodePath = `./public/images/qrcode_personal_${chatId}.png`;
+      const referralQRCodePath = `./public/images/qrcode_referral_${chatId}.png`;
+
+      await QRCode.toFile(personalQRCodePath, personal_code);
+      await QRCode.toFile(referralQRCodePath, referral_code);
+
+      const registerUser = await model.registerUser(
+         requestName,
+         requestGender,
+         requestDay,
+         requestAge,
+         `+${requestContact}`,
+         chatId,
+         personal_code,
+         referral_code,
+         `${process.env.BACKEND_URL}/qrcode_personal_${chatId}.png`,
+         `qrcode_personal_${chatId}.png`,
+         `${process.env.BACKEND_URL}/qrcode_referral_${chatId}.png`,
+         `qrcode_referral_${chatId}.png`,
+         lang
+      );
+
+      if (registerUser) {
+         const langText = lang === 'uz' ? `${requestName}, muvaffaqiyatli ro'yxatdan o'tdingiz.` : `${requestName}, вы успешно зарегистрировались.`;
+         const keyboardOptions = lang === 'uz' ? [
+            ["🛍 Buyurtma berish"],
+            ["✍️ Fikr bildirish", "💸 Jamg'arma"],
+            ["ℹ️ Maʼlumot", "⚙️ Sozlamalar"],
+            ["👥 Yaqinlarim"]
+         ] : [
+            ["🛍 Заказать"],
+            ["✍️ Оставить отзыв", "💸 Накопитель"],
+            ["ℹ️ Информация", "⚙️ Настройки"],
+            ["👥 Мои близкие"]
+         ];
+         bot.sendMessage(chatId, langText, generateKeyboard(keyboardOptions));
+      }
+   };
+
+   if (lang === 'uz' || lang === 'ru') {
+      if (foundUserByChatId) {
+         const editUserLang = await model.editUserLang(foundUserByChatId?.user_id, lang);
          if (editUserLang) {
-            bot.sendMessage(chatId, `${foundUserByChatId?.user_name}! Оформим заказ вместе? 😃`, {
-               reply_markup: JSON.stringify({
-                  keyboard: [
-                     [
-                        {
-                           text: "🛍 Заказать"
-                        }
-                     ],
-                     [
-                        {
-                           text: "✍️ Оставить отзыв"
-                        },
-                        {
-                           text: "💸 Накопитель"
-                        }
-                     ],
-                     [
-                        {
-                           text: "ℹ️ Информация"
-                        },
-                        {
-                           text: "⚙️ Настройки"
-                        }
-                     ],
-                     [
-                        {
-                           text: "👥 Мои близкие"
-                        }
-                     ]
-                  ],
-                  resize_keyboard: true
-               })
-            })
+            handleLanguage(lang, foundUserByChatId);
          }
       } else {
-         bot.sendMessage(chatId, 'Напишите свое имя', {
-            reply_markup: {
-               force_reply: true
-            }
-         }).then(payload => {
-            const replyListenerId = bot.onReplyToMessage(payload.chat.id, payload.message_id, msg => {
-               bot.removeListener(replyListenerId)
-
-               if (msg.text) {
-                  requestName = msg.text
-
-                  bot.sendMessage(msg.chat.id, `🎂 ${requestName}, когда мы можем поздравить тебя с днем ​​рождения? Введите дату в формате дд.мм.гггг`, {
-                     reply_markup: {
-                        force_reply: true
-                     }
-                  }).then(payload => {
-                     const replyListenerId = bot.onReplyToMessage(payload.chat.id, payload.message_id, msg => {
-                        bot.removeListener(replyListenerId)
-
-                        if (msg.text) {
-                           requestDay = msg.text
-                           requestAge = calculateAge(msg.text)
-
-                           bot.sendMessage(msg.chat.id, `${requestName}, выберите пол`, {
-                              reply_markup: JSON.stringify({
-                                 keyboard:
-                                    [
-                                       [
-                                          {
-                                             text: 'Мужской',
-                                             force_reply: true
-                                          },
-                                          {
-                                             text: 'Женщина',
-                                             force_reply: true
-                                          }
-                                       ]
-                                    ],
-                                 resize_keyboard: true
-                              })
-                           }).then(payload => {
-                              const replyListenerId = bot.on('message', msg => {
-                                 bot.removeListener(replyListenerId)
-
-                                 if (msg.text) {
-                                    requestGender = msg.text
-
-                                    bot.sendMessage(msg.chat.id, `${requestName}, Отправьте свой контакт`, {
-                                       reply_markup: JSON.stringify({
-                                          keyboard:
-                                             [
-                                                [
-                                                   {
-                                                      text: 'Отправить контакт',
-                                                      request_contact: true,
-                                                      one_time_keyboard: true
-                                                   }
-                                                ]
-                                             ],
-                                          resize_keyboard: true
-                                       })
-                                    }).then(payload => {
-                                       const replyListenerId = bot.on("contact", async (msg) => {
-                                          bot.removeListener(replyListenerId)
-
-                                          if (msg.contact) {
-                                             requestContact = msg.contact.phone_number;
-                                             const personal_code = uuidv4();
-                                             const referral_code = uuidv4();
-
-                                             if (requestName && requestGender && requestContact && requestDay) {
-
-                                                QRCode.toFile(`./public/images/qrcode_personal_${chatId}.png`, personal_code, {}, async (err) => {
-                                                   if (err) throw err;
-                                                })
-
-                                                QRCode.toFile(`./public/images/qrcode_referral_${chatId}.png`, referral_code, {}, async (err) => {
-                                                   if (err) throw err;
-                                                })
-
-
-                                                const registerUser = await model.registerUser(
-                                                   requestName,
-                                                   requestGender,
-                                                   requestDay,
-                                                   requestAge,
-                                                   `+${requestContact}`,
-                                                   chatId,
-                                                   personal_code,
-                                                   referral_code,
-                                                   `${process.env.BACKEND_URL}/qrcode_personal_${chatId}.png`,
-                                                   `qrcode_personal_${chatId}.png`,
-                                                   `${process.env.BACKEND_URL}/qrcode_referral_${chatId}.png`,
-                                                   `qrcode_referral_${chatId}.png`,
-                                                   lang
-                                                )
-
-                                                if (registerUser) {
-                                                   bot.sendMessage(chatId, `${requestName}, вы успешно зарегистрировались.`, {
-                                                      reply_markup: JSON.stringify({
-                                                         keyboard: [
-                                                            [
-                                                               {
-                                                                  text: "🛍 Buyurtma berish"
-                                                               }
-                                                            ],
-                                                            [
-                                                               {
-                                                                  text: "✍️ Fikr bildirish"
-                                                               },
-                                                               {
-                                                                  text: "💸 Jamg'arma"
-                                                               }
-                                                            ],
-                                                            [
-                                                               {
-                                                                  text: "ℹ️ Maʼlumot"
-                                                               },
-                                                               {
-                                                                  text: "⚙️ Sozlamalar"
-                                                               }
-                                                            ],
-                                                            [
-                                                               {
-                                                                  text: "👥 Yaqinlarim"
-                                                               }
-                                                            ]
-                                                         ],
-                                                         resize_keyboard: true
-                                                      })
-                                                   })
-                                                }
-                                             }
-                                          }
-                                       })
-                                    })
-                                 }
-                              })
-                           })
-                        }
-                     })
-                  })
-               }
-            })
-         })
+         askName();
       }
    }
-})
+});
+
 
 // CASHBEK
 bot.on('message', async msg => {
@@ -1732,7 +1517,7 @@ bot.on("message", async msg => {
          return [{ text: e.product_name_uz, callback_data: e.product_id }];
       });
 
-      bot.sendMessage(chatId, "Taomni tanlang", {
+      bot.sendMessage(chatId, "Shirinlikni tanlang", {
          reply_markup: {
             inline_keyboard: inlineKeyboard,
          }
@@ -1746,13 +1531,13 @@ bot.on("message", async msg => {
          return [{ text: e.product_name_ru, callback_data: e.product_id }];
       });
 
-      bot.sendMessage(chatId, "Выберите блюдо", {
+      bot.sendMessage(chatId, "Выберите десерт", {
          reply_markup: {
             inline_keyboard: inlineKeyboard,
          }
       });
 
-   } else if (userStates[chatId].currentCategory && !isNaN(Number(text))) {
+   } else if (userStates[chatId].currentCategory) {
       const count = Number(text);
 
       if (!isNaN(count) && count > 0) {
@@ -1792,6 +1577,12 @@ bot.on("message", async msg => {
                }
             });
          }
+      } else {
+         if (userStates[chatId].lang == "uz") {
+            bot.sendMessage(chatId, "Iltimos, to'g'ri miqdorni kiriting.");
+         } else if (userStates[chatId].lang == "ru") {
+            bot.sendMessage(chatId, "Пожалуйста, введите правильное количество.");
+         }
       }
    }
 });
@@ -1806,30 +1597,26 @@ bot.on("callback_query", async callbackQuery => {
          const product = foundProduct;
          userStates[chatId].currentProduct = product;
 
-         if (userStates[chatId].lang == "uz") {
-            const content = `<strong>${foundProduct.product_name_uz}</strong>\n\n${foundProduct.product_description_uz}\n${formatNumber(foundProduct.product_price)} sum`;
+         const sendProductMessage = (lang, productName, productDescription, productPrice) => {
+            const content = `<strong>${productName}</strong>\n\n${productDescription}\n${formatNumber(productPrice)} сум`;
             bot.sendMessage(chatId, content, {
                parse_mode: "HTML",
                reply_markup: {
                   keyboard: [
-                     [{ text: '1' }, { text: '2' }, { text: '3' }, { text: '4' }]
+                     [{ text: '1' }, { text: '2' }, { text: '3' }, { text: '4' }],
+                     [{ text: lang === 'uz' ? 'O\'z miqdorini kiriting' : 'Введите свое количество' }]
                   ],
-                  resize_keyboard: true
+                  resize_keyboard: true,
+                  one_time_keyboard: true
                }
             });
-         } else if (userStates[chatId].lang == "ru") {
-            const content = `<strong>${foundProduct.product_name_ru}</strong>\n\n${foundProduct.product_description_ru}\n${formatNumber(foundProduct.product_price)} сум`;
-            bot.sendMessage(chatId, content, {
-               parse_mode: "HTML",
-               reply_markup: {
-                  keyboard: [
-                     [{ text: '1' }, { text: '2' }, { text: '3' }, { text: '4' }]
-                  ],
-                  resize_keyboard: true
-               }
-            });
-         }
+         };
 
+         if (userStates[chatId].lang == "uz") {
+            sendProductMessage('uz', product.product_name_uz, product.product_description_uz, product.product_price);
+         } else if (userStates[chatId].lang == "ru") {
+            sendProductMessage('ru', product.product_name_ru, product.product_description_ru, product.product_price);
+         }
       }
    }
 });
@@ -1841,106 +1628,77 @@ bot.on("message", async msg => {
    if (text == "Savat") {
       if (products_id?.length > 0) {
          const products = products_id.map((e, index) => `${index + 1}. ${e.product_name_uz} - ${formatNumber(Number(e.total))} sum`).join("\n");
-         const totalAmount = products_id
-            .reduce((acc, e) => acc + Number(e.total), 0);
+         const totalAmount = products_id.reduce((acc, e) => acc + Number(e.total), 0);
 
          if (deleviry) {
             bot.sendMessage(chatId, `${products}\nYetkazib berish - 20 000 sum\nJami: ${formatNumber(totalAmount + 20000)} sum`, {
                reply_markup: JSON.stringify({
                   keyboard: [
-                     [
-                        { text: "Tasdiqlash" }
-                     ],
-                     [
-                        { text: "Bekor qilish" }
-                     ],
+                     [{ text: "Tasdiqlash" }],
+                     [{ text: "Bekor qilish" }],
                   ],
                   resize_keyboard: true
                })
-            })
-
+            });
          } else {
             bot.sendMessage(chatId, `${products}\nJami: ${formatNumber(totalAmount)} sum`, {
                reply_markup: JSON.stringify({
                   keyboard: [
-                     [
-                        { text: "Tasdiqlash" }
-                     ],
-                     [
-                        { text: "Bekor qilish" }
-                     ],
+                     [{ text: "Tasdiqlash" }],
+                     [{ text: "Bekor qilish" }],
                   ],
                   resize_keyboard: true
                })
-            })
+            });
          }
-
       } else {
          bot.sendMessage(chatId, "Savat bo'sh", {
             reply_markup: JSON.stringify({
                keyboard: [
-                  [
-                     {
-                        text: "⬅️ Ortga"
-                     }
-                  ]
+                  [{ text: "⬅️ Ortga" }]
                ],
                resize_keyboard: true
             })
-         })
+         });
       }
    } else if (text == "Корзина") {
       if (products_id?.length > 0) {
          const products = products_id.map((e, index) => `${index + 1}. ${e.product_name_ru} - ${formatNumber(Number(e.total))} сум`).join("\n");
-         const totalAmount = products_id
-            .reduce((acc, e) => acc + Number(e.total), 0);
+         const totalAmount = products_id.reduce((acc, e) => acc + Number(e.total), 0);
 
          if (deleviry) {
             bot.sendMessage(chatId, `${products}\nДоставка - 20 000 сум\nОбщий: ${formatNumber(totalAmount + 20000)} сум`, {
                reply_markup: JSON.stringify({
                   keyboard: [
-                     [
-                        { text: "Подтвердить" }
-                     ],
-                     [
-                        { text: "Отмена" }
-                     ],
+                     [{ text: "Подтвердить" }],
+                     [{ text: "Отмена" }],
                   ],
                   resize_keyboard: true
                })
-            })
+            });
          } else {
             bot.sendMessage(chatId, `${products}\nОбщий: ${formatNumber(totalAmount)} сум`, {
                reply_markup: JSON.stringify({
                   keyboard: [
-                     [
-                        { text: "Подтвердить" }
-                     ],
-                     [
-                        { text: "Отмена" }
-                     ],
+                     [{ text: "Подтвердить" }],
+                     [{ text: "Отмена" }],
                   ],
                   resize_keyboard: true
                })
-            })
+            });
          }
-
       } else {
          bot.sendMessage(chatId, "Корзина пуста", {
             reply_markup: JSON.stringify({
                keyboard: [
-                  [
-                     {
-                        text: "⬅️ Назад"
-                     }
-                  ]
+                  [{ text: "⬅️ Назад" }]
                ],
                resize_keyboard: true
             })
-         })
+         });
       }
    }
-})
+});
 
 bot.on("message", async msg => {
    const chatId = msg.chat.id;
