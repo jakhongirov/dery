@@ -14,6 +14,22 @@ const cashbekList = (limit, page) => {
 
    return fetchALL(QUERY)
 }
+const foundCashbek = (user_id, limit, page) => {
+   const QUERY = `
+      SELECT
+         *
+      FROM
+         cashbek
+      WHERE
+         user_id = $1
+      ORDER BY
+         id DESC
+      LIMIT ${limit}
+      OFFSET ${Number((page - 1) * limit)}
+   `;
+
+   return fetchALL(QUERY, user_id)
+}
 const foundCode = (code) => {
    const QUERY = `
       SELECT
@@ -89,6 +105,7 @@ const removekUserBalance = (user_id, amount) => {
 
 module.exports = {
    cashbekList,
+   foundCashbek,
    foundCode,
    addCashbekUserBalance,
    addCashbek,

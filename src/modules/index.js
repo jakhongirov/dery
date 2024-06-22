@@ -13,7 +13,7 @@ const products = require('./products/products')
 const news = require('./news/news')
 const orders = require("./orders/orders")
 const reviews = require('./reviews/reviews')
-const cashbek =require('./cashbek/cashbek')
+const cashbek = require('./cashbek/cashbek')
 
 router
    //  ADMINS
@@ -57,6 +57,7 @@ router
 
    // CASHBEK
    .get('/cashbek/list', AUTH, cashbek.GET)
+   .get('/cashbek/history', AUTH, cashbek.GET_USER_ID)
    .post('/cashbek', cashbek.POST)
 
 module.exports = router
