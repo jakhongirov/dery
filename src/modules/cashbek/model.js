@@ -4,7 +4,7 @@ const cashbekList = (limit, page) => {
    const QUERY = `
       SELECT
          id,
-         user_id,
+         a.user_id,
          user_name,
          user_phone,
          amount,
