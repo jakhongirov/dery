@@ -1,11 +1,17 @@
 const { fetch, fetchALL } = require('../../lib/postgres')
 
-const usersList = (limit, page) => {
+const usersList = (limit, page, phone) => {
    const QUERY = `
       SELECT
          *
       FROM
          users
+      ${phone ? (
+         `
+             WHERE
+               user_phone like '%${phone}%'
+          `
+      ) : ""}
       ORDER BY
          user_id DESC
       LIMIT ${Number(limit)}
