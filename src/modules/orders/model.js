@@ -21,7 +21,7 @@ const ordersList = (limit, page, phone) => {
          phone ? (
             `
                WHERE
-                  user_phone like '%${phone}'
+                  user_phone like '%${phone}%'
             `
          ) : ""
       }
