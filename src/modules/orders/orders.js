@@ -3,10 +3,10 @@ const model = require('./model')
 module.exports = {
    GET: async (req, res) => {
       try {
-         const { limit, page, phone} = req.query
+         const { limit, page, phone } = req.query
 
          if (limit && page) {
-            const ordersList = await model.ordersList(limit, page)
+            const ordersList = await model.ordersList(limit, page, phone)
 
             if (ordersList?.length > 0) {
                return res.status(200).json({
