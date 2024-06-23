@@ -272,17 +272,34 @@ bot.on('callback_query', async msg => {
    };
 
    const askContact = async () => {
-      const langText = lang === 'uz' ? `${requestName}, Kontaktingizni yuboring` : `${requestName}, Отправьте свой контакт`;
+      const langText = lang === 'uz' ? `${requestName}, Kontaktingizni yuboring yoki raqamingizni yozing` : `${requestName}, Отправьте свой контакт или введите свой номер`;
       bot.sendMessage(chatId, langText, generateKeyboard([
          [{ text: lang === 'uz' ? 'Kontaktni yuborish' : 'Отправить контакт', request_contact: true, one_time_keyboard: true }]
-      ]))
-         .then(() => {
-            bot.on('contact', async msg => {
-               requestContact = msg.contact.phone_number;
-               await registerUser();
-            });
-         });
+      ]));
+
+      const validatePhoneNumber = (number) => {
+         const regex = /^\+?[0-9]{10,15}$/; // Adjust the regex according to your phone number format requirements
+         return regex.test(number);
+      };
+
+      const contactListener = async (msg) => {
+         if (msg.contact) {
+            requestContact = msg.contact.phone_number;
+            bot.removeListener('message', contactListener);
+            await registerUser();
+         } else if (msg.text && validatePhoneNumber(msg.text)) {
+            requestContact = msg.text.startsWith('+') ? msg.text : `+${msg.text}`;
+            bot.removeListener('message', contactListener);
+            await registerUser();
+         } else {
+            const retryText = lang === 'uz' ? `Noto'g'ri format! Iltimos, to'g'ri telefon raqamini kiriting. +998*********` : `Неправильный формат! Пожалуйста, введите правильный номер телефона. +998*********`;
+            bot.sendMessage(chatId, retryText);
+         }
+      };
+
+      bot.on('message', contactListener);
    };
+
 
    const registerUser = async () => {
       const personal_code = uuidv4();
@@ -298,7 +315,7 @@ bot.on('callback_query', async msg => {
          requestGender,
          requestDay,
          requestAge,
-         `+${requestContact}`,
+         requestContact,
          chatId,
          personal_code,
          referral_code,
