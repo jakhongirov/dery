@@ -26,6 +26,7 @@ router
    // USERS
    .get('/users/list', AUTH, users.GET)
    .get('/user/:id', users.GET_BY_ID)
+   .delete('/user/delete', users.DELETE)
 
    // CATEGORIES
    .get('/categories', categories.GET)

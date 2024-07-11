@@ -33,8 +33,20 @@ const foundUserById = (id) => {
 
    return fetch(QUERY, id)
 }
+const deleteUser = (id) => {
+   const QUERY = `
+      DELETE FROM
+         users
+      WHERE
+         user_id = $1
+      RETURNING *;
+   `;
+
+   return fetch(QUERY, id)
+}
 
 module.exports = {
    usersList,
-   foundUserById
+   foundUserById,
+   deleteUser
 }

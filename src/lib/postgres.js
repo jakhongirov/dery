@@ -2,10 +2,10 @@ const { Pool } = require("pg");
 const { connection } = require("../config");
 
 const credentials = {
-   user: "deryuz",
+   user: "postgres",
    host: "localhost",
-   database: "deryuz_database",
-   password: "gY6Zrgj)9DD+11",
+   database: "dery",
+   password: "behad2024",
    port: 5432,
    max: 50,
    idleTimeoutMillis: 30000,

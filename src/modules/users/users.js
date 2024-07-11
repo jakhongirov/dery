@@ -73,4 +73,45 @@ module.exports = {
       }
    },
 
+   DELETE: async (req, res) => {
+      try {
+         const { id } = req.body
+
+         if (id) {
+            const deleteUser = await model.deleteUser(id)
+
+            if (deleteUser) {
+               if (deleteUser?.user_referral_bonus_image_name) {
+                  const deleteOldAvatar = new FS(path.resolve(__dirname, '..', '..', '..', 'public', 'images', `${deleteUser?.user_referral_bonus_image_name}`))
+                  deleteOldAvatar.delete()
+               }
+
+               if (deleteUser?.user_personal_code_image_name) {
+                  const deleteOldAvatar = new FS(path.resolve(__dirname, '..', '..', '..', 'public', 'images', `${deleteUser?.user_personal_code_image_name}`))
+                  deleteOldAvatar.delete()
+               }
+
+               return res.status(200).json({
+                  status: 200,
+                  message: "Success",
+                  data: deleteUser
+               })
+            }
+
+         } else {
+            return res.status(400).json({
+               status: 400,
+               message: "Bad request"
+            })
+         }
+
+      } catch (error) {
+         console.log(error);
+         res.status(500).json({
+            status: 500,
+            message: "Interval Server Error"
+         })
+      }
+   }
+
 }

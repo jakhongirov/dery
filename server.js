@@ -8,6 +8,9 @@ const fs = require('fs');
 const path = require('path')
 const QRCode = require('qrcode');
 const cron = require('node-cron');
+const axios = require('axios');
+const process = require('process');
+const bodyParser = require('body-parser');
 const moment = require('moment-timezone');
 const { v4: uuidv4 } = require('uuid');
 const { bot } = require('./src/lib/bot')
@@ -31,27 +34,10 @@ if (!fs.existsSync(imagesFolderPath)) {
    console.log('Images folder already exists within the public folder.');
 }
 
-cron.schedule('0 0 * * *', async () => {
-   const now = moment().tz('Asia/Tashkent');
-   console.log('Running check at 12:00 AM Uzbekistan time:', now.format());
-   await checkBirthdays();
-}, {
-   scheduled: true,
-   timezone: "Asia/Tashkent"
-});
-
-// // Immediately invoke the function with the current Uzbekistan time
-// (async () => {
-//    const now = moment().tz('Asia/Tashkent');
-//    console.log('Immediate check at:', now.format());
-//    await checkBirthdays();
-// })();
-
-const axios = require('axios');
-
+// Function to send keep-alive requests to Telegram
 async function sendKeepAlive() {
    try {
-      const response = await axios.get(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/getMe`);
+      const response = await axios.get(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/getUpdates`);
       if (response.status !== 200) {
          console.error(`Keep-alive failed: ${response.statusText}`);
       } else {
@@ -62,11 +48,33 @@ async function sendKeepAlive() {
    }
 }
 
-// Set up keep-alive interval (every 5 minutes)
-setInterval(sendKeepAlive, 5 * 60 * 1000);
+// Schedule keep-alive requests every 5 minutes
+setInterval(sendKeepAlive, 5 * 60 * 1000); // 5 minutes in milliseconds
 
 // Call sendKeepAlive immediately to test the connection at startup
 sendKeepAlive();
+
+// Example cron job to check birthdays at 12:00 AM Tashkent time
+cron.schedule('0 0 * * *', async () => {
+   const now = moment().tz('Asia/Tashkent');
+   console.log('Running check at 12:00 AM Uzbekistan time:', now.format());
+   await checkBirthdays();
+}, {
+   scheduled: true,
+   timezone: "Asia/Tashkent"
+});
+
+// Global error handling
+process.on('unhandledRejection', (reason, promise) => {
+   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+   // Application specific logging, throwing an error, or other logic here
+});
+
+process.on('uncaughtException', (err) => {
+   console.error('Uncaught Exception:', err);
+   // Application specific logging, throwing an error, or other logic here
+   process.exit(1); // Optional: exit the process to restart it
+});
 
 
 // START
@@ -212,8 +220,7 @@ bot.on('callback_query', async msg => {
          ["👥 Мои близкие"]
       ];
 
-      const greeting = lang === 'uz' ? `${user?.user_name},
-       Iltimos, kerakli menyuni tanlang:` : `${user?.user_name}, Пожалуйста, выберите желаемое меню:`;
+      const greeting = lang === 'uz' ? `${user?.user_name}, Iltimos, kerakli menyuni tanlang:` : `${user?.user_name}, Пожалуйста, выберите желаемое меню:`;
       bot.sendMessage(chatId, greeting, generateKeyboard(keyboardOptions));
    };
 
@@ -344,7 +351,7 @@ bot.on('callback_query', async msg => {
          const keyboardOptions = lang === 'uz' ? [
             // ["🛍 Buyurtma berish"],
             ["Bizning manzil 📍"],
-            ["✍️ Fikr bildirish",] // "💸 Jamg'arma"],
+            ["✍️ Fikr bildirish",], // "💸 Jamg'arma"],
             ["ℹ️ Maʼlumot", "⚙️ Sozlamalar"],
             ["👥 Yaqinlarim"]
          ] : [
@@ -369,7 +376,6 @@ bot.on('callback_query', async msg => {
       }
    }
 });
-
 
 // CASHBEK
 bot.on('message', async msg => {
@@ -1993,10 +1999,14 @@ bot.on("message", async msg => {
 
 app.use(cors({ origin: "*" }))
 app.use(express.json());
+app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/public', express.static(path.resolve(__dirname, 'public')))
 app.use("/api/v1", router);
-const pm2 = require('pm2');
+
+const { spawn } = require('child_process');
+const webhookUrl = 'https://server.dery.uz/telegrambot';
+const lockFile = path.resolve(__dirname, 'bot.lock');
 
 app.post('/telegrambot', (req, res) => {
    try {
@@ -2021,30 +2031,70 @@ bot.setWebHook('https://server.dery.uz/telegrambot');
 
 process.on('uncaughtException', (err) => {
    console.error('Uncaught Exception:', err.stack || err);
-   // Optional: Restart the bot
-   pm2.restart('telegram-bot');
 });
 
 process.on('unhandledRejection', (reason, promise) => {
    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-   // Optional: Restart the bot
-   pm2.restart('telegram-bot');
 });
 
-const { spawn } = require('child_process');
+
+// bot.setWebHook(webhookUrl);
+
+app.post('/telegrambot', (req, res) => {
+   try {
+      bot.processUpdate(req.body);
+      res.sendStatus(200);
+   } catch (e) {
+      console.error('Error processing webhook:', e);
+      res.sendStatus(500);
+   }
+});
+
+app.get('/health', (_, res) => {
+   try {
+      res.json({ message: "Success" });
+   } catch (e) {
+      console.error('Health check error:', e);
+      res.status(500).json({ message: "Error" });
+   }
+});
+
+process.on('uncaughtException', (err) => {
+   console.error('Uncaught Exception:', err.stack || err);
+   process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+   process.exit(1);
+});
+
 
 function startBot() {
-   const botProcess = spawn('node', ['bot.js'], { stdio: 'inherit' });
+   if (fs.existsSync(lockFile)) {
+      console.log('Bot is already running.');
+      return;
+   }
+
+   fs.writeFileSync(lockFile, 'locked');
+
+   const botProcess = spawn('node', ['server.js'], { stdio: 'inherit' });
 
    botProcess.on('close', (code) => {
+      fs.unlinkSync(lockFile); // Remove the lock file
       if (code !== 0) {
          console.log(`Bot process exited with code ${code}, restarting...`);
          setTimeout(startBot, 5000); // Restart after a delay (e.g., 5 seconds)
       }
    });
+
+   botProcess.on('error', (err) => {
+      fs.unlinkSync(lockFile); // Remove the lock file
+      console.error('Error starting bot process:', err);
+      setTimeout(startBot, 5000); // Restart after a delay (e.g., 5 seconds)
+   });
 }
 
 startBot();
-
 
 app.listen(PORT, console.log(PORT));
