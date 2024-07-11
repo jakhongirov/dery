@@ -35,24 +35,24 @@ if (!fs.existsSync(imagesFolderPath)) {
 }
 
 // Function to send keep-alive requests to Telegram
-async function sendKeepAlive() {
-   try {
-      const response = await axios.get(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/getUpdates`);
-      if (response.status !== 200) {
-         console.error(`Keep-alive failed: ${response.statusText}`);
-      } else {
-         console.log("Keep-alive successful");
-      }
-   } catch (error) {
-      console.error(`Keep-alive error: ${error.message}`);
-   }
-}
+// async function sendKeepAlive() {
+//    try {
+//       const response = await axios.get(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/getUpdates`);
+//       if (response.status !== 200) {
+//          console.error(`Keep-alive failed: ${response.statusText}`);
+//       } else {
+//          console.log("Keep-alive successful");
+//       }
+//    } catch (error) {
+//       console.error(`Keep-alive error: ${error.message}`);
+//    }
+// }
 
 // Schedule keep-alive requests every 5 minutes
-setInterval(sendKeepAlive, 5 * 60 * 1000); // 5 minutes in milliseconds
+// setInterval(sendKeepAlive, 5 * 60 * 1000); // 5 minutes in milliseconds
 
 // Call sendKeepAlive immediately to test the connection at startup
-sendKeepAlive();
+// sendKeepAlive();
 
 // Example cron job to check birthdays at 12:00 AM Tashkent time
 cron.schedule('0 0 * * *', async () => {
@@ -2004,9 +2004,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/public', express.static(path.resolve(__dirname, 'public')))
 app.use("/api/v1", router);
 
-const { spawn } = require('child_process');
-const webhookUrl = 'https://server.dery.uz/telegrambot';
-const lockFile = path.resolve(__dirname, 'bot.lock');
+// const { spawn } = require('child_process');
+// const webhookUrl = 'https://server.dery.uz/telegrambot';
+// const lockFile = path.resolve(__dirname, 'bot.lock');
 
 app.post('/telegrambot', (req, res) => {
    try {
@@ -2027,74 +2027,53 @@ app.get('/health', (_, res) => {
    }
 });
 
-bot.setWebHook('https://server.dery.uz/telegrambot');
+// process.on('uncaughtException', (err) => {
+//    console.error('Uncaught Exception:', err.stack || err);
+// });
 
-process.on('uncaughtException', (err) => {
-   console.error('Uncaught Exception:', err.stack || err);
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-});
+// process.on('unhandledRejection', (reason, promise) => {
+//    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+// });
 
 
 // bot.setWebHook(webhookUrl);
 
-app.post('/telegrambot', (req, res) => {
-   try {
-      bot.processUpdate(req.body);
-      res.sendStatus(200);
-   } catch (e) {
-      console.error('Error processing webhook:', e);
-      res.sendStatus(500);
-   }
-});
+// process.on('uncaughtException', (err) => {
+//    console.error('Uncaught Exception:', err.stack || err);
+//    process.exit(1);
+// });
 
-app.get('/health', (_, res) => {
-   try {
-      res.json({ message: "Success" });
-   } catch (e) {
-      console.error('Health check error:', e);
-      res.status(500).json({ message: "Error" });
-   }
-});
-
-process.on('uncaughtException', (err) => {
-   console.error('Uncaught Exception:', err.stack || err);
-   process.exit(1);
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-   process.exit(1);
-});
+// process.on('unhandledRejection', (reason, promise) => {
+//    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+//    process.exit(1);
+// });
 
 
-function startBot() {
-   if (fs.existsSync(lockFile)) {
-      console.log('Bot is already running.');
-      return;
-   }
+// function startBot() {
+//    if (fs.existsSync(lockFile)) {
+//       console.log('Bot is already running.');
+//       return;
+//    }
 
-   fs.writeFileSync(lockFile, 'locked');
+//    fs.writeFileSync(lockFile, 'locked');
 
-   const botProcess = spawn('node', ['server.js'], { stdio: 'inherit' });
+//    const botProcess = spawn('node', ['server.js'], { stdio: 'inherit' });
 
-   botProcess.on('close', (code) => {
-      fs.unlinkSync(lockFile); // Remove the lock file
-      if (code !== 0) {
-         console.log(`Bot process exited with code ${code}, restarting...`);
-         setTimeout(startBot, 5000); // Restart after a delay (e.g., 5 seconds)
-      }
-   });
+//    botProcess.on('close', (code) => {
+//       fs.unlinkSync(lockFile); // Remove the lock file
+//       if (code !== 0) {
+//          console.log(`Bot process exited with code ${code}, restarting...`);
+//          setTimeout(startBot, 5000); // Restart after a delay (e.g., 5 seconds)
+//       }
+//    });
 
-   botProcess.on('error', (err) => {
-      fs.unlinkSync(lockFile); // Remove the lock file
-      console.error('Error starting bot process:', err);
-      setTimeout(startBot, 5000); // Restart after a delay (e.g., 5 seconds)
-   });
-}
+//    botProcess.on('error', (err) => {
+//       fs.unlinkSync(lockFile); // Remove the lock file
+//       console.error('Error starting bot process:', err);
+//       setTimeout(startBot, 5000); // Restart after a delay (e.g., 5 seconds)
+//    });
+// }
 
-startBot();
+// startBot();
 
 app.listen(PORT, console.log(PORT));
