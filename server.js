@@ -844,7 +844,7 @@ bot.on('message', async msg => {
                   {
                      text: "Instagram",
                      callback_data: "instagram",
-                     url: "https://www.instagram.com/dery_confectionery/"
+                     url: "https://www.instagram.com/dery_confectionery?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
                   },
                ],
                [
