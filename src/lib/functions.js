@@ -51,7 +51,7 @@ const checkBirthdays = async () => {
    const list = birthdayList.map((person, index) => `${index + 1}. ${person.name} - ${person.birthday} tug'ilgan, yaqinini nomeri ${person.phone}`).join("\n");
 
    // Send the consolidated list
-   bot.sendMessage(5926167059, list);
+   bot.sendMessage(process.env.CHAT_ID_REVIEW, list);
 }
 
 
