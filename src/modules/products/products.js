@@ -3,6 +3,7 @@ const model = require('./model')
 const path = require('path')
 const FS = require('../../lib/fs/fs')
 const fs = require('fs')
+const sharp = require('sharp');
 
 const resizeImage = async (inputPath, outputPath) => {
    await sharp(inputPath)
@@ -197,8 +198,8 @@ module.exports = {
             let imgName = '';
 
             if (uploadPhoto) {
-               if (foundProduct.product_image_name) {
-                  const oldImagePath = path.resolve(__dirname, '..', 'public', 'images', foundProduct.product_image_name);
+               if (foundProduct?.product_image_name) {
+                  const oldImagePath = path.resolve(__dirname, '..', 'public', 'images', foundProduct?.product_image_name);
                   fs.unlinkSync(oldImagePath);
                }
 
