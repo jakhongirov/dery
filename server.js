@@ -1843,12 +1843,29 @@ bot.on("message", async msg => {
             })
          })
 
-         if (deleviry) {
-            bot.sendLocation(process.env.CHAT_ID_ORDER, clientLatitude, clientLongitude)
+         if (delivery) {
+            bot.sendLocation(process.env.CHAT_ID_ORDER, clientLatitude, clientLongitude);
             bot.sendMessage(process.env.CHAT_ID_ORDER, `${products}\nYetkazib berish - 20 000 so'm\nJami: ${formatNumber(totalAmount + 20000)} so'm\n${foundUserByChatId?.user_phone}`,)
+               .then(() => {
+                  // Clear the products after sending the message
+                  products = []; // Assuming products is an array
+                  totalAmount = 0; // Reset totalAmount if needed
+               })
+               .catch((error) => {
+                  console.error('Error sending message:', error);
+               });
          } else {
             bot.sendMessage(process.env.CHAT_ID_ORDER, `${products}\nJami: ${formatNumber(totalAmount)} so'm\n${foundUserByChatId?.user_phone}\nOlib ketish`,)
+               .then(() => {
+                  // Clear the products after sending the message
+                  products = []; // Assuming products is an array
+                  totalAmount = 0; // Reset totalAmount if needed
+               })
+               .catch((error) => {
+                  console.error('Error sending message:', error);
+               });
          }
+
       }
 
    } else if (text == "Bekor qilish") {
