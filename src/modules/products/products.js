@@ -2,6 +2,7 @@ require('dotenv').config();
 const model = require('./model')
 const path = require('path')
 const FS = require('../../lib/fs/fs')
+const fs = require('fs')
 
 const resizeImage = async (inputPath, outputPath) => {
    await sharp(inputPath)
