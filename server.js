@@ -88,11 +88,11 @@ bot.onText(/\/start/, async msg => {
          bot.sendMessage(chatId, `${foundUserByChatId?.user_name}, Iltimos, kerakli menyuni tanlang:`, {
             reply_markup: JSON.stringify({
                keyboard: [
-                  // [
-                  //    {
-                  //       text: "🛍 Buyurtma berish"
-                  //    }
-                  // ],
+                  [
+                     {
+                        text: "🛍 Buyurtma berish"
+                     }
+                  ],
                   [
                      {
                         text: "Bizning manzil 📍"
