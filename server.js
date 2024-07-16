@@ -13,7 +13,6 @@ const process = require('process');
 const bodyParser = require('body-parser');
 const moment = require('moment-timezone');
 const { v4: uuidv4 } = require('uuid');
-const sharp = require('sharp');
 const { bot } = require('./src/lib/bot')
 const model = require('./model')
 const { formatNumber, checkBirthdays, calculateAge, calculatePercentage } = require('./src/lib/functions');
@@ -1668,56 +1667,32 @@ bot.on("callback_query", async callbackQuery => {
          userStates[chatId].currentProduct = product;
 
          const imagePath = path.resolve(__dirname, '.', 'public', 'images', product?.product_image_name);
-
          if (userStates[chatId]?.lang == 'uz') {
-            const resizedImagePath = path.resolve(__dirname, '.', 'public', 'images', product?.product_image_name);
-            sharp(imagePath)
-               .resize(1280, 1280, { fit: 'inside' }) // Resize the image to fit within 1280x1280
-               .toFile(resizedImagePath, (err, info) => {
-                  if (err) {
-                     console.error('Error resizing image:', err);
-                     return;
-                  }
-
-                  // Send the resized image
-                  bot.sendPhoto(chatId, fs.readFileSync(resizedImagePath), {
-                     parse_mode: 'HTML',
-                     caption: `<strong>${product?.product_name_uz}</strong>\n\n${product?.product_description_uz}\n\n${formatNumber(product?.product_price)} so'm`,
-                     reply_markup: {
-                        keyboard: [
-                           [{ text: '1' }, { text: '2' }, { text: '3' }, { text: '4' }],
-                           [{ text: "O'z miqdorini kiriting" }]
-                        ],
-                        resize_keyboard: true,
-                        one_time_keyboard: true
-                     }
-                  });
-               });
+            bot.sendPhoto(chatId, fs.readFileSync(imagePath), {
+               parse_mode: "HTML",
+               caption: `<strong>${product?.product_name_uz}</strong>\n\n${product?.product_description_uz}\n\n${formatNumber(product?.product_price)} so'm`,
+               reply_markup: {
+                  keyboard: [
+                     [{ text: '1' }, { text: '2' }, { text: '3' }, { text: '4' }],
+                     [{ text: 'O\'z miqdorini kiriting' }]
+                  ],
+                  resize_keyboard: true,
+                  one_time_keyboard: true
+               }
+            });
          } else if (userStates[chatId]?.lang == 'ru') {
-            const resizedImagePath = path.resolve(__dirname, '.', 'public', 'images', product?.product_image_name);
-            sharp(imagePath)
-               .resize(1280, 1280, { fit: 'inside' }) // Resize the image to fit within 1280x1280
-               .toFile(resizedImagePath, (err, info) => {
-                  if (err) {
-                     console.error('Error resizing image:', err);
-                     return;
-                  }
-
-                  // Send the resized image
-                  bot.sendPhoto(chatId, fs.readFileSync(resizedImagePath), {
-                     parse_mode: "HTML",
-                     caption: `<strong>${product?.product_name_ru}</strong>\n\n${product?.product_description_ru}\n\n${formatNumber(product?.product_price)} сум`,
-                     reply_markup: {
-                        keyboard: [
-                           [{ text: '1' }, { text: '2' }, { text: '3' }, { text: '4' }],
-                           [{ text: 'Введите свое количество' }]
-                        ],
-                        resize_keyboard: true,
-                        one_time_keyboard: true
-                     }
-                  });
-               });
-
+            bot.sendPhoto(chatId, fs.readFileSync(imagePath), {
+               parse_mode: "HTML",
+               caption: `<strong>${product?.product_name_ru}</strong>\n\n${product?.product_description_ru}\n\n${formatNumber(product?.product_price)} сум`,
+               reply_markup: {
+                  keyboard: [
+                     [{ text: '1' }, { text: '2' }, { text: '3' }, { text: '4' }],
+                     [{ text: 'Введите свое количество' }]
+                  ],
+                  resize_keyboard: true,
+                  one_time_keyboard: true
+               }
+            });
          }
 
          // if (userStates[chatId].lang == "uz") {

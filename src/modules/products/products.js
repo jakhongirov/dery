@@ -3,6 +3,12 @@ const model = require('./model')
 const path = require('path')
 const FS = require('../../lib/fs/fs')
 
+const resizeImage = async (inputPath, outputPath) => {
+   await sharp(inputPath)
+      .resize(1280, 1280, { fit: 'inside' })
+      .toFile(outputPath);
+};
+
 module.exports = {
    GET: async (req, res) => {
       try {
@@ -122,40 +128,51 @@ module.exports = {
             product_description_ru,
             product_price,
             category_id
-         } = req.body
-         const imgUrl = `${process.env.BACKEND_URL}/${uploadPhoto?.filename}`;
-         const imgName = uploadPhoto?.filename;
+         } = req.body;
 
-         const addProduct = await model.addProduct(
-            product_name_uz,
-            product_name_ru,
-            product_description_uz,
-            product_description_ru,
-            product_price,
-            category_id,
-            imgUrl,
-            imgName
-         )
+         if (uploadPhoto) {
+            const inputPath = path.resolve(__dirname, '..', 'public', 'images', uploadPhoto.filename);
+            const outputPath = path.resolve(__dirname, '..', 'public', 'images', `resized_${uploadPhoto.filename}`);
+            await resizeImage(inputPath, outputPath);
 
-         if (addProduct) {
-            return res.status(200).json({
-               status: 200,
-               message: "Success",
-               data: addProduct
-            })
+            const imgUrl = `${process.env.BACKEND_URL}/resized_${uploadPhoto.filename}`;
+            const imgName = `resized_${uploadPhoto.filename}`;
+
+            const addProduct = await model.addProduct(
+               product_name_uz,
+               product_name_ru,
+               product_description_uz,
+               product_description_ru,
+               product_price,
+               category_id,
+               imgUrl,
+               imgName
+            );
+
+            if (addProduct) {
+               return res.status(200).json({
+                  status: 200,
+                  message: 'Success',
+                  data: addProduct
+               });
+            } else {
+               return res.status(400).json({
+                  status: 400,
+                  message: 'Bad request'
+               });
+            }
          } else {
             return res.status(400).json({
                status: 400,
-               message: "Bad request"
-            })
+               message: 'No image uploaded'
+            });
          }
-
       } catch (error) {
          console.log(error);
          res.status(500).json({
             status: 500,
-            message: "Interval Server Error"
-         })
+            message: 'Internal Server Error'
+         });
       }
    },
 
@@ -170,23 +187,29 @@ module.exports = {
             product_description_ru,
             product_price,
             category_id
-         } = req.body
-         const foundProduct = await model.foundProduct(id)
+         } = req.body;
+
+         const foundProduct = await model.foundProduct(id);
 
          if (foundProduct) {
             let imgUrl = '';
             let imgName = '';
 
             if (uploadPhoto) {
-               if (foundProduct?.product_image_name) {
-                  const deleteOldAvatar = new FS(path.resolve(__dirname, '..', '..', '..', 'public', 'images', `${foundProduct?.product_image_name}`))
-                  deleteOldAvatar.delete()
+               if (foundProduct.product_image_name) {
+                  const oldImagePath = path.resolve(__dirname, '..', 'public', 'images', foundProduct.product_image_name);
+                  fs.unlinkSync(oldImagePath);
                }
-               imgUrl = `${process.env.BACKEND_URL}/${uploadPhoto?.filename}`;
-               imgName = uploadPhoto?.filename;
+
+               const inputPath = path.resolve(__dirname, '..', 'public', 'images', uploadPhoto.filename);
+               const outputPath = path.resolve(__dirname, '..', 'public', 'images', `resized_${uploadPhoto.filename}`);
+               await resizeImage(inputPath, outputPath);
+
+               imgUrl = `${process.env.BACKEND_URL}/resized_${uploadPhoto.filename}`;
+               imgName = `resized_${uploadPhoto.filename}`;
             } else {
-               imgUrl = foundProduct?.product_image_url;
-               imgName = foundProduct?.product_image_name;
+               imgUrl = foundProduct.product_image_url;
+               imgName = foundProduct.product_image_name;
             }
 
             const editProduct = await model.editProduct(
@@ -199,35 +222,32 @@ module.exports = {
                category_id,
                imgUrl,
                imgName
-            )
+            );
 
             if (editProduct) {
                return res.status(200).json({
                   status: 200,
-                  message: "Success",
+                  message: 'Success',
                   data: editProduct
-               })
+               });
             } else {
                return res.status(400).json({
                   status: 400,
-                  message: "Bad request"
-               })
+                  message: 'Bad request'
+               });
             }
-
-
          } else {
             return res.status(404).json({
                status: 404,
-               message: "Not found"
-            })
+               message: 'Not found'
+            });
          }
-
       } catch (error) {
          console.log(error);
          res.status(500).json({
             status: 500,
-            message: "Interval Server Error"
-         })
+            message: 'Internal Server Error'
+         });
       }
    },
 
