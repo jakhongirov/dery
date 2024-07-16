@@ -1847,7 +1847,7 @@ bot.on("message", async msg => {
             bot.sendLocation(process.env.CHAT_ID_ORDER, clientLatitude, clientLongitude)
             bot.sendMessage(process.env.CHAT_ID_ORDER, `${products}\nYetkazib berish - 20 000 so'm\nJami: ${formatNumber(totalAmount + 20000)} so'm\n${foundUserByChatId?.user_phone}`,)
          } else {
-            bot.sendMessage(process.env.CHAT_ID_ORDER, `${products}\nJami: ${formatNumber(totalAmount + 20000)} so'm\n${foundUserByChatId?.user_phone}\nOlib ketish`,)
+            bot.sendMessage(process.env.CHAT_ID_ORDER, `${products}\nJami: ${formatNumber(totalAmount)} so'm\n${foundUserByChatId?.user_phone}\nOlib ketish`,)
          }
       }
 
