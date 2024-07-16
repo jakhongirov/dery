@@ -6,6 +6,11 @@ const fs = require('fs')
 const sharp = require('sharp');
 
 const resizeImage = async (inputPath, outputPath) => {
+   // Check if the input file exists
+   if (!fs.existsSync(inputPath)) {
+      throw new Error(`Input file is missing: ${inputPath}`);
+   }
+
    await sharp(inputPath)
       .resize(1280, 1280, { fit: 'inside' })
       .toFile(outputPath);
@@ -133,8 +138,8 @@ module.exports = {
          } = req.body;
 
          if (uploadPhoto) {
-            const inputPath = path.resolve(__dirname, '..', 'public', 'images', uploadPhoto.filename);
-            const outputPath = path.resolve(__dirname, '..', 'public', 'images', `resized_${uploadPhoto.filename}`);
+            const inputPath = path.resolve(__dirname, '..', '..', '..', 'public', 'images', uploadPhoto.filename);
+            const outputPath = path.resolve(__dirname, '..', '..', '..', 'public', 'images', `resized_${uploadPhoto.filename}`);
             await resizeImage(inputPath, outputPath);
 
             const imgUrl = `${process.env.BACKEND_URL}/resized_${uploadPhoto.filename}`;
@@ -199,12 +204,12 @@ module.exports = {
 
             if (uploadPhoto) {
                if (foundProduct?.product_image_name) {
-                  const oldImagePath = path.resolve(__dirname, '..', 'public', 'images', foundProduct?.product_image_name);
+                  const oldImagePath = path.resolve(__dirname, '..', '..', '..', 'public', 'images', foundProduct?.product_image_name);
                   fs.unlinkSync(oldImagePath);
                }
 
-               const inputPath = path.resolve(__dirname, '..', 'public', 'images', uploadPhoto.filename);
-               const outputPath = path.resolve(__dirname, '..', 'public', 'images', `resized_${uploadPhoto.filename}`);
+               const inputPath = path.resolve(__dirname, '..', '..', '..', 'public', 'images', uploadPhoto.filename);
+               const outputPath = path.resolve(__dirname, '..', '..', '..', 'public', 'images', `resized_${uploadPhoto.filename}`);
                await resizeImage(inputPath, outputPath);
 
                imgUrl = `${process.env.BACKEND_URL}/resized_${uploadPhoto.filename}`;
