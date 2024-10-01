@@ -80,7 +80,7 @@ module.exports = {
          const foundCode = await model.foundCode(code)
 
          if (foundCode) {
-            const cashbek = calculatePercentage(amount, 5)
+            const cashbek = calculatePercentage(amount, 10)
 
             if (foundCode?.user_referral_bonus == code) {
                if (type == 'income') {
