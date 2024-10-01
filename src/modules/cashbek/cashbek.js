@@ -93,6 +93,11 @@ module.exports = {
                         message: "Success"
                      })
                   }
+               } else if (type == "psy") {
+                  return res.status(400).json({
+                     status: 400,
+                     message: "You can not pay from referral bonus QR-code"
+                  })
                }
             } else if (foundCode?.user_personal == code) {
                if (type == "income") {
