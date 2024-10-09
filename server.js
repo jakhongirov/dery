@@ -392,7 +392,7 @@ bot.on('message', async msg => {
                keyboard: [
                   [
                      {
-                        text: "🆔 QR-kod"
+                        text: "🆔 Hisobinginzdan mablag' yechish uchun QR-kod"
                      }
                   ],
                   [
@@ -410,7 +410,7 @@ bot.on('message', async msg => {
             })
          })
       }
-   } else if (text == '🆔 QR-kod' || text == '🆔 Получить QR-код') {
+   } else if (text == `🆔 Hisobinginzdan mablag' yechish uchun QR-kod` || text == '🆔 QR-код для вывода денег со счета') {
       bot.sendPhoto(chatId, `./public/images/${foundUserByChatId?.user_personal_code_image_name}`)
    } else if (text == "🧑‍🤝‍🧑 Do'stlarga yuborish" || text == '🧑‍🤝‍🧑 Отправить друзьям') {
       bot.sendPhoto(chatId, `./public/images/${foundUserByChatId?.user_referral_bonus_image_name}`)
@@ -423,7 +423,7 @@ bot.on('message', async msg => {
                keyboard: [
                   [
                      {
-                        text: "🆔 Получить QR-код"
+                        text: "🆔 QR-код для вывода денег со счета"
                      }
                   ],
                   [
