@@ -44,9 +44,34 @@ const deleteUser = (id) => {
 
    return fetch(QUERY, id)
 }
+const getRelationships = (limit, page) => {
+   const QUERY = `
+      SELECT
+         a.user_id,
+         user_name,
+         user_phone,
+         relationship_name,
+         relationship_birthday,
+         relationship_gender,
+         relationship_age
+      FROM
+         users_relationship a
+      INNER JOIN
+         users b
+      ON
+         a.user_id = b.user_id
+      ORDER BY
+         relationship_create_at
+      LIMIT ${Number(limit)}
+      OFFSET ${Number((page - 1) * limit)};
+   `;
+
+   return fetchALL(QUERY)
+}
 
 module.exports = {
    usersList,
    foundUserById,
-   deleteUser
+   deleteUser,
+   getRelationships
 }

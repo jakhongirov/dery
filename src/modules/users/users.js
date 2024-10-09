@@ -112,6 +112,34 @@ module.exports = {
             message: "Interval Server Error"
          })
       }
+   },
+
+   USER_RELATIONSHIP: async (req, res) => {
+      try {
+         const { limit, page } = req.query
+
+         const getRelationships = await model.getRelationships(limit, page)
+
+         if (getRelationships?.length > 0) {
+            return res.status(200).json({
+               status: 200,
+               message: "Success",
+               data: getRelationships
+            })
+         } else {
+            return res.status(404).json({
+               status: 404,
+               message: "Not found"
+            })
+         }
+
+      } catch (error) {
+         console.log(error);
+         res.status(500).json({
+            status: 500,
+            message: "Interval Server Error"
+         })
+      }
    }
 
 }
