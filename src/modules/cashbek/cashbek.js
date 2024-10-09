@@ -96,7 +96,7 @@ module.exports = {
                } else if (type == "psy") {
                   return res.status(400).json({
                      status: 400,
-                     message: "You can not pay from referral bonus QR-code"
+                     message: "Referral QR-koddan pul yechib bo'lmaydi!"
                   })
                }
             } else if (foundCode?.user_personal == code) {
@@ -105,9 +105,9 @@ module.exports = {
                   const addCashbek = await model.addCashbek(foundCode?.user_id, cashbek, code, type, "Personal bonus")
 
                   if (addCashbek && addCashbekUserBalance) {
-                     return res.status(200).json({
-                        status: 200,
-                        message: "Success"
+                     return res.status(400).json({
+                        status: 400,
+                        message: "Personal QR-kodga bonus berilmaydi!"
                      })
                   }
                } else if (type == 'pay') {
