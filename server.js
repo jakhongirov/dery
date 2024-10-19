@@ -2076,7 +2076,7 @@ bot.on("message", async msg => {
 bot.on('message', async msg => {
    const chatId = msg.chat.id;
    const text = msg.text;
-   const pathCatalog = './files/DERY catalog.pdf'
+   const pathCatalog = './files/catalog.pdf'
 
    if (text == "Bizning katalog") {
       bot.sendDocument(chatId, pathCatalog, {
