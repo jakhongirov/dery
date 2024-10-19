@@ -95,6 +95,11 @@ bot.onText(/\/start/, async msg => {
                   // ],
                   [
                      {
+                        text: "Bizning katalog"
+                     },
+                  ],
+                  [
+                     {
                         text: "Bizning manzil 📍"
                      },
                   ],
@@ -132,6 +137,11 @@ bot.onText(/\/start/, async msg => {
                   //       text: "🛍 Заказать"
                   //    }
                   // ],
+                  [
+                     {
+                        text: "Наш каталог"
+                     },
+                  ],
                   [
                      {
                         text: "Наш адрес 📍"
@@ -209,11 +219,13 @@ bot.on('callback_query', async msg => {
       const keyboardOptions = lang === 'uz' ? [
          // ["🛍 Buyurtma berish"],
          ["Bizning manzil 📍"],
+         ["Bizning katalog"],
          ["✍️ Fikr bildirish", "💸 Jamg'arma"],
          ["ℹ️ Maʼlumot", "⚙️ Sozlamalar"],
          ["👥 Yaqinlarim"]
       ] : [
          // ["🛍 Заказать"],
+         ["Наш каталог"],
          ["Наш адрес 📍"],
          ["✍️ Оставить отзыв", "💸 Накопитель"],
          ["ℹ️ Информация", "⚙️ Настройки"],
@@ -350,12 +362,14 @@ bot.on('callback_query', async msg => {
          const langText = lang === 'uz' ? `${requestName}, muvaffaqiyatli ro'yxatdan o'tdingiz.` : `${requestName}, вы успешно зарегистрировались.`;
          const keyboardOptions = lang === 'uz' ? [
             // ["🛍 Buyurtma berish"],
+            ["Bizning katalog"],
             ["Bizning manzil 📍"],
             ["✍️ Fikr bildirish", "💸 Jamg'arma"],
             ["ℹ️ Maʼlumot", "⚙️ Sozlamalar"],
             ["👥 Yaqinlarim"]
          ] : [
             // ["🛍 Заказать"],
+            ["Наш каталог"],
             ["Наш адрес 📍"],
             ["✍️ Оставить отзыв", "💸 Накопитель"],
             ["ℹ️ Информация", "⚙️ Настройки"],
@@ -726,6 +740,11 @@ bot.on('message', async msg => {
                // ],
                [
                   {
+                     text: "Bizning katalog"
+                  },
+               ],
+               [
+                  {
                      text: "Bizning manzil 📍"
                   },
                ],
@@ -765,6 +784,16 @@ bot.on('message', async msg => {
                //       text: "🛍 Заказать"
                //    }
                // ],
+               [
+                  {
+                     text: "Наш каталог"
+                  },
+               ],
+               [
+                  {
+                     text: "Bizning katalog"
+                  },
+               ],
                [
                   {
                      text: "Наш адрес 📍"
@@ -960,6 +989,11 @@ bot.on("message", async msg => {
                               // ],
                               [
                                  {
+                                    text: "Bizning katalog"
+                                 },
+                              ],
+                              [
+                                 {
                                     text: "Bizning manzil 📍"
                                  },
                               ],
@@ -1017,6 +1051,11 @@ bot.on("message", async msg => {
                               //       text: "🛍 Заказать"
                               //    }
                               // ],
+                              [
+                                 {
+                                    text: "Наш каталог"
+                                 },
+                              ],
                               [
                                  {
                                     text: "Наш адрес 📍"
@@ -1814,6 +1853,11 @@ bot.on("message", async msg => {
                   // ],
                   [
                      {
+                        text: "Bizning katalog"
+                     },
+                  ],
+                  [
+                     {
                         text: "Bizning manzil 📍"
                      },
                   ],
@@ -1880,6 +1924,11 @@ bot.on("message", async msg => {
                // ],
                [
                   {
+                     text: "Bizning katalog"
+                  },
+               ],
+               [
+                  {
                      text: "Bizning manzil 📍"
                   },
                ],
@@ -1935,6 +1984,11 @@ bot.on("message", async msg => {
                   // ],
                   [
                      {
+                        text: "Наш каталог"
+                     },
+                  ],
+                  [
+                     {
                         text: "Наш адрес 📍"
                      },
                   ],
@@ -1981,6 +2035,107 @@ bot.on("message", async msg => {
                //       text: "🛍 Заказать"
                //    }
                // ],
+               [
+                  {
+                     text: "Наш каталог"
+                  },
+               ],
+               [
+                  {
+                     text: "Наш адрес 📍"
+                  },
+               ],
+               [
+                  {
+                     text: "✍️ Оставить отзыв"
+                  },
+                  {
+                     text: "💸 Накопитель"
+                  }
+               ],
+               [
+                  {
+                     text: "ℹ️ Информация"
+                  },
+                  {
+                     text: "⚙️ Настройки"
+                  }
+               ],
+               [
+                  {
+                     text: "👥 Мои близкие"
+                  }
+               ]
+            ],
+            resize_keyboard: true
+         })
+      })
+   }
+})
+
+bot.on('message', async msg => {
+   const chatId = msg.chat.id;
+   const text = msg.text;
+   const pathCatalog = './files/DERY catalog.pdf'
+
+   if (text == "Bizning katalog") {
+      bot.sendDocument(chatId, pathCatalog, {
+         reply_markup: JSON.stringify({
+            keyboard: [
+               // [
+               //    {
+               //       text: "🛍 Buyurtma berish"
+               //    }
+               // ],
+               [
+                  {
+                     text: "Bizning katalog"
+                  },
+               ],
+               [
+                  {
+                     text: "Bizning manzil 📍"
+                  },
+               ],
+               [
+                  {
+                     text: "✍️ Fikr bildirish"
+                  },
+                  {
+                     text: "💸 Jamg'arma"
+                  }
+               ],
+               [
+                  {
+                     text: "ℹ️ Maʼlumot"
+                  },
+                  {
+                     text: "⚙️ Sozlamalar"
+                  }
+               ],
+               [
+                  {
+                     text: "👥 Yaqinlarim"
+                  }
+               ]
+            ],
+            resize_keyboard: true
+         })
+      })
+   } else if (text == "Наш каталог") {
+      bot.sendDocument(chatId, pathCatalog, {
+         reply_markup: JSON.stringify({
+            keyboard: [
+               // [
+               //    {
+               //       text: "🛍 Заказать"
+               //    }
+               // ],
+               [
+                  {
+                     text: "Наш каталог"
+                  },
+               ],
                [
                   {
                      text: "Наш адрес 📍"
