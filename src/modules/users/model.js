@@ -61,7 +61,7 @@ const getRelationships = (limit, page) => {
       ON
          a.user_id = b.user_id
       ORDER BY
-         relationship_create_at
+         TO_DATE(SUBSTRING(relationship_birthday, 1, 5), 'DD.MM') ASC
       LIMIT ${Number(limit)}
       OFFSET ${Number((page - 1) * limit)};
    `;

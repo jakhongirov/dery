@@ -12,7 +12,7 @@ const checkBirthdays = async () => {
    const datesToCheck = [];
    const birthdayList = [];
 
-   for (let i = 0; i < 3; i++) {
+   for (let i = 0; i < 7; i++) {
       const checkDate = new Date(today);
       checkDate.setDate(today.getDate() + i);
       const day = String(checkDate.getDate()).padStart(2, '0');

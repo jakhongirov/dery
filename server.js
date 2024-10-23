@@ -1161,7 +1161,7 @@ bot.on("message", async msg => {
       let requestGender
       let requestAge
 
-      bot.sendMessage(chatId, "Ismini yozing", {
+      bot.sendMessage(chatId, "Ismini yozing va sizga kim bo'ladi\nMasalan: Diyor o'g'lim", {
          reply_markup: {
             force_reply: true
          }
@@ -1318,7 +1318,7 @@ bot.on("message", async msg => {
       let requestGender
       let requestAge
 
-      bot.sendMessage(chatId, "Напишите имя", {
+      bot.sendMessage(chatId, "Напишите имя и кто будет вам\nНапример: Надир мой сын", {
          reply_markup: {
             force_reply: true
          }
